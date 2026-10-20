@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+package-lock.json
+.claude/initial-prompt.md
+.claude/design-prototype

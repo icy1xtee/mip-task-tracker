@@ -1,0 +1,51 @@
+rules_version = '2';
+
+// Приватные данные «Вместе». Поведение по умолчанию — deny.
+// Доступ есть только у UID из allowlist; любой другой вошедший пользователь
+// (даже созданный в том же Firebase-проекте) ничего не прочитает и не запишет.
+//
+// Как заполнить allowlist: Firebase Console → Authentication → Users →
+// скопируйте «User UID» общей учётной записи и замените placeholder ниже.
+// Второго пользователя позже можно добавить в тот же список.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isMember() {
+      return request.auth != null
+        && request.auth.uid in [
+          '0Qa1cvHqnITHBcoBJWuM7bd2kdz2',
+          'wFbNvDlI3LfKyhuB9IAjYKkx0ML2'
+        ];
+    }
+
+    // Коллекции приложения перечислены явно: неизвестные коллекции остаются закрытыми.
+    // Валидация полей добавляется вместе с реализацией каждой сущности.
+    match /tasks/{id} {
+      allow read, write: if isMember();
+    }
+    match /activities/{id} {
+      allow read, write: if isMember();
+    }
+    match /accounts/{id} {
+      allow read, write: if isMember();
+    }
+    match /plannedEntries/{id} {
+      allow read, write: if isMember();
+    }
+    match /recurringRules/{id} {
+      allow read, write: if isMember();
+    }
+    match /recurringOccurrences/{id} {
+      allow read, write: if isMember();
+    }
+    match /transactions/{id} {
+      allow read, write: if isMember();
+    }
+    match /links/{id} {
+      allow read, write: if isMember();
+    }
+    match /appSettings/{id} {
+      allow read, write: if isMember();
+    }
+  }
+}

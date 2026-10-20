@@ -1,0 +1,26 @@
+# deps & build
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# env — реальные значения не коммитим
+.env
+.env.*
+!.env.example
+
+# firebase
+.firebase/
+.firebaserc
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# claude code — локальные настройки
+.claude/settings.local.json
+
+# os / editors
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json
