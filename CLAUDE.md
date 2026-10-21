@@ -1,6 +1,6 @@
 # mip — CLAUDE.md
 
-Адаптивное SPA для двух партнёров: дела, идеи досуга, бюджет с прогнозом, ссылки, обзор.
+Адаптивное SPA для двух партнёров: дела, идеи досуга, бюджет с прогнозом, места на карте, ссылки, обзор.
 Полное ТЗ — [.claude/initial-prompt.md](.claude/initial-prompt.md) (рабочее название там «Вместе»,
 в макете и интерфейсе — **mip**). ТЗ — источник истины по функциональности и модели данных.
 
@@ -32,7 +32,10 @@ npm run format       # Prettier
   слоёв, чтобы утилиты Tailwind 4 с совпадающими именами вроде `.block` его не перебивали).
   Tailwind оставлен для редких утилит (`sr-only`); токены доступны и как `bg-surface` и т.п.
 - React Router 8 (declarative mode, маршруты в `src/app/App.tsx`): `/`, `/tasks`, `/ideas`,
-  `/budget`, `/budget/actual`, `/links`, `/login`.
+  `/budget`, `/budget/actual`, `/places`, `/links`, `/login`.
+- Карта «Мест» — MapLibre GL (лениво, отдельный чанк) + векторные тайлы OpenFreeMap (Positron);
+  поиск и обратное геокодирование — Photon, сайт/часы по id OSM — Nominatim. Ключей и биллинга нет.
+  ТЗ раздела — [.claude/features/feat-001-maps/initial.md](.claude/features/feat-001-maps/initial.md).
 - Firebase Auth + Cloud Firestore (persistent cache) + Hosting. **Своего backend нет.**
 - Radix (`radix-ui`: Dialog, AlertDialog, DropdownMenu), react-hook-form + zod, date-fns.
 - Иконки — пути из прототипа в `components/ui/Icon.tsx` (lucide/recharts не используются:
@@ -46,6 +49,7 @@ src/
                        (боковая панель / bottom sheet), ConfirmDialog, toast, States (DataView)
   components/layout/   AppShell (сайдбар 232 → рейка 72 → topbar+tabbar), chrome.ts (заголовок и «+» на телефоне)
   features/<name>/     Page + api.ts (Firestore) + формы + *View.ts (чистая логика экрана, с тестами)
+  features/places/     + osm.ts (Photon/Nominatim, разбор ответов), PlacesMap (MapLibre), placeForms.ts
   lib/finance/         recurrence, plan (развёртка плана), forecast, analytics, categories
   lib/firebase/        client (init, эмуляторы), db (useCollection, write-guard), parse, errors
   lib/format/          money, dates, plural, url; lib/forms.ts — zod-поля форм
@@ -85,6 +89,8 @@ tests/rules/           тесты Firestore Rules (@firebase/rules-unit-testing)
 - [x] Этап 3: счета, разовые и регулярные операции, отметки экземпляров, прогноз.
 - [x] Этап 4: фактические операции, аналитика по категориям и месяцам.
 - [ ] Этап 5: деплой новых rules и hosting (по просьбе пользователя), ручная проверка на устройствах.
+- [x] feat-001 «Места» (MVP): карта, поиск, ручная точка, посещения с оценками, фильтры, рекомендации.
+  Не сделано (после MVP по ТЗ): связь с идеями/бюджетом/календарём, статистика по городам и категориям.
 
 ## Нюансы окружения
 
@@ -93,5 +99,9 @@ tests/rules/           тесты Firestore Rules (@firebase/rules-unit-testing)
 - `npm audit` ругается на `@grpc/grpc-js` внутри firebase — это Node-транспорт Firestore,
   в браузерный бандл не попадает; `audit fix --force` откатывает firebase до v9 — не делать.
 - Java в системе нет. Для `test:rules`/`emulators` нужна JRE 21 в PATH (например, Temurin).
+- MapLibre v6 ищет worker рядом со своим модулем — путь задан через `setWorkerUrl(…?url)` в
+  `PlacesMap.tsx`. Её CSS грузится лениво и позже `mip.css`: стили контейнера карты пиши
+  специфичнее `.maplibregl-map`.
+- Photon подстраивает язык под Accept-Language браузера — в запросах всегда `lang=default`.
 - Heredoc в shell может превращать ` ` в буквальный символ — ESLint ловит это как
   `no-irregular-whitespace`; в исходниках держи escape-последовательности.

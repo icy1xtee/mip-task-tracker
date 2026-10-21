@@ -82,3 +82,50 @@ export function Panel({
     </Dialog.Root>
   );
 }
+
+type ViewPanelProps = {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  /** Кнопки в заголовке рядом с «Закрыть» (например, меню «…»). */
+  headerActions?: ReactNode;
+  /** Подвал с действиями; без него панель — просто карточка для чтения. */
+  footer?: ReactNode;
+  children: ReactNode;
+};
+
+/** Та же боковая панель / bottom sheet, но для просмотра карточки, а не формы. */
+export function ViewPanel({
+  open,
+  onClose,
+  title,
+  headerActions,
+  footer,
+  children,
+}: ViewPanelProps) {
+  const container = usePortalContainer();
+  const { contentRef, overlayRef, dragHandlers } = useSheetDrag({ enabled: true, onClose });
+  return (
+    <Dialog.Root open={open} onOpenChange={(next) => !next && onClose()}>
+      <Dialog.Portal container={container}>
+        <Dialog.Overlay className="scrim" ref={overlayRef} />
+        <Dialog.Content className="panel" aria-describedby={undefined} ref={contentRef}>
+          <div className="panel-drag" {...dragHandlers}>
+            <div className="grabber" />
+            <div className="panel-head">
+              <Dialog.Title className="h2">{title}</Dialog.Title>
+              <div className="panel-head-actions">
+                {headerActions}
+                <Dialog.Close asChild>
+                  <IconButton icon="x" label="Закрыть" />
+                </Dialog.Close>
+              </div>
+            </div>
+          </div>
+          <div className="panel-body">{children}</div>
+          {footer && <div className="panel-foot">{footer}</div>}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

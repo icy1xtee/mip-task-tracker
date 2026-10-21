@@ -3,6 +3,7 @@ import {
   addDaysIso,
   addMonthsIso,
   diffDays,
+  formatAgo,
   formatDayMonth,
   formatDayMonthShort,
   formatMonthYear,
@@ -57,5 +58,21 @@ describe('IsoDate helpers', () => {
     expect(formatDayMonthShort('2027-01-05', TODAY)).toBe('5 янв 2027');
     expect(formatWeekdayDayMonth('2026-10-20', TODAY)).toBe('Вторник, 20 октября');
     expect(formatMonthYear('2026-10')).toBe('Октябрь 2026');
+  });
+});
+
+describe('formatAgo', () => {
+  it.each([
+    ['2026-10-20', 'сегодня'],
+    ['2026-10-19', 'вчера'],
+    ['2026-10-15', '5 дней назад'],
+    ['2026-10-12', 'неделю назад'],
+    ['2026-09-28', '3 недели назад'],
+    ['2026-09-20', 'месяц назад'],
+    ['2026-06-14', '4 месяца назад'],
+    ['2025-10-20', 'год назад'],
+    ['2021-01-01', '5 лет назад'],
+  ])('%s → %s', (date, expected) => {
+    expect(formatAgo(date, TODAY)).toBe(expected);
   });
 });

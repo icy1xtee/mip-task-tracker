@@ -17,7 +17,9 @@ export type CollectionName =
   | 'recurringRules'
   | 'recurringOccurrences'
   | 'transactions'
-  | 'links';
+  | 'links'
+  | 'places'
+  | 'placeVisits';
 
 export function db() {
   return getFirebase().db;

@@ -7,5 +7,6 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/tasks', label: 'Дела', icon: 'tasks' },
   { to: '/ideas', label: 'Идеи', icon: 'idea' },
   { to: '/budget', label: 'Бюджет', icon: 'wallet' },
+  { to: '/places', label: 'Места', icon: 'pin' },
   { to: '/links', label: 'Ссылки', icon: 'link' },
 ];

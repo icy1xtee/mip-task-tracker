@@ -18,6 +18,8 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             { name: 'firebase', test: /node_modules[\\/](@firebase|firebase)[\\/]/ },
+            // Карта нужна только разделу «Места» — отдельный чанк, который грузится лениво.
+            { name: 'maplibre', test: /node_modules[\\/]maplibre-gl[\\/]/ },
             { name: 'vendor', test: /node_modules[\\/]/ },
           ],
         },

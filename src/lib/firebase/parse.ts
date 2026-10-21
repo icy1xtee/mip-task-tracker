@@ -30,6 +30,13 @@ export function intOrNull(data: DocumentData, key: string): number | null {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : null;
 }
 
+/** Конечное число (в том числе дробное) — для координат. */
+export function num(data: DocumentData, key: string): number {
+  const v = data[key];
+  if (typeof v !== 'number' || !Number.isFinite(v)) throw new InvalidDocument(key);
+  return v;
+}
+
 export function bool(data: DocumentData, key: string): boolean {
   return data[key] === true;
 }

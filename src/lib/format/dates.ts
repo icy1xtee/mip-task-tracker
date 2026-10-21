@@ -2,11 +2,13 @@ import {
   addDays,
   addMonths,
   differenceInCalendarDays,
+  differenceInMonths,
   format,
   getDaysInMonth,
   isValid,
   parse,
 } from 'date-fns';
+import { pl } from './plural';
 
 /**
  * Календарная дата в формате YYYY-MM-DD. Хранится и сравнивается как строка,
@@ -203,6 +205,27 @@ export function formatMonthColumn(month: IsoMonth): string {
 
 export function dayOfMonth(value: IsoDate): number {
   return parts(value).d;
+}
+
+/** «сегодня», «вчера», «5 дней назад», «3 недели назад», «4 месяца назад», «2 года назад». */
+export function formatAgo(value: IsoDate, today: IsoDate = todayIsoDate()): string {
+  const days = diffDays(value, today);
+  if (days <= 0) return 'сегодня';
+  if (days === 1) return 'вчера';
+  if (days < 7) return `${days} ${pl(days, 'день', 'дня', 'дней')} назад`;
+  const months = differenceInMonths(parseIsoDate(today), parseIsoDate(value));
+  if (months < 1) {
+    const weeks = Math.floor(days / 7);
+    return weeks === 1
+      ? 'неделю назад'
+      : `${weeks} ${pl(weeks, 'неделю', 'недели', 'недель')} назад`;
+  }
+  if (months < 12)
+    return months === 1
+      ? 'месяц назад'
+      : `${months} ${pl(months, 'месяц', 'месяца', 'месяцев')} назад`;
+  const years = Math.floor(months / 12);
+  return years === 1 ? 'год назад' : `${years} ${pl(years, 'год', 'года', 'лет')} назад`;
 }
 
 /** «25 октября 2026» — всегда с годом (для текста, который уходит за пределы приложения). */

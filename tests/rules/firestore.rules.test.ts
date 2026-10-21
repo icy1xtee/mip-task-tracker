@@ -13,6 +13,7 @@ import {
   setDoc,
   Timestamp,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -232,5 +233,117 @@ describe('бюджет', () => {
     await assertFails(
       setDoc(doc(member(), 'recurringOccurrences/random-id'), { ...occ, ...now() }),
     );
+  });
+});
+
+describe('места', () => {
+  const place = {
+    provider: 'osm',
+    providerPlaceId: 'N1309605858',
+    name: 'Stereobar',
+    address: 'Дворцовая набережная, 38',
+    city: 'Санкт-Петербург',
+    latitude: 59.9404625,
+    longitude: 30.3151887,
+    category: 'bar',
+    status: 'visited',
+    note: null,
+  };
+  const visit = {
+    placeId: 'p1',
+    date: '2026-09-14',
+    spentMinor: 684000,
+    pavelRating: 8,
+    milaRating: 9,
+    pavelReturnScore: 7,
+    milaReturnScore: 10,
+    note: 'Хороший звук',
+  };
+
+  it('без входа и не из allowlist места не читаются', async () => {
+    await assertFails(getDoc(doc(anonymous(), 'places/p1')));
+    await assertFails(getDoc(doc(stranger(), 'places/p1')));
+    await assertFails(getDoc(doc(stranger(), 'placeVisits/v1')));
+  });
+
+  it('место OSM и ручная точка', async () => {
+    await assertSucceeds(setDoc(doc(member(), 'places/p1'), { ...place, ...now() }));
+    await assertSucceeds(
+      setDoc(doc(member(), 'places/p2'), {
+        ...place,
+        provider: 'manual',
+        providerPlaceId: null,
+        latitude: 60,
+        ...now(),
+      }),
+    );
+    // У ручной точки нет внешнего id, у OSM-места он обязателен и в формате «N123».
+    await assertFails(
+      setDoc(doc(member(), 'places/p3'), { ...place, provider: 'manual', ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'places/p4'), { ...place, providerPlaceId: null, ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'places/p5'), { ...place, providerPlaceId: 'ChIJ123', ...now() }),
+    );
+  });
+
+  it('отклоняет координаты вне диапазона, неизвестную категорию и лишние поля', async () => {
+    await assertFails(setDoc(doc(member(), 'places/p1'), { ...place, latitude: 91, ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'places/p1'), { ...place, longitude: '30.3', ...now() }),
+    );
+    await assertFails(setDoc(doc(member(), 'places/p1'), { ...place, category: 'spa', ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'places/p1'), { ...place, status: 'favorite', ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'places/p1'), { ...place, googleData: { rating: 4.5 }, ...now() }),
+    );
+  });
+
+  it('посещение: только к существующему месту, оценки — целые 1–10', async () => {
+    await assertFails(setDoc(doc(member(), 'placeVisits/v0'), { ...visit, ...now() }));
+    await assertSucceeds(setDoc(doc(member(), 'places/p1'), { ...place, ...now() }));
+    await assertSucceeds(setDoc(doc(member(), 'placeVisits/v1'), { ...visit, ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'placeVisits/v2'), { ...visit, pavelRating: 11, ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'placeVisits/v3'), { ...visit, milaRating: 8.5, ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'placeVisits/v4'), { ...visit, spentMinor: 100.5, ...now() }),
+    );
+    await assertSucceeds(
+      setDoc(doc(member(), 'placeVisits/v5'), {
+        ...visit,
+        spentMinor: null,
+        pavelRating: null,
+        milaRating: null,
+        pavelReturnScore: null,
+        milaReturnScore: null,
+        note: null,
+        ...now(),
+      }),
+    );
+  });
+
+  it('место и первое посещение создаются одним batch', async () => {
+    const db = member();
+    const batch = writeBatch(db);
+    batch.set(doc(db, 'places/p9'), { ...place, ...now() });
+    batch.set(doc(db, 'placeVisits/v9'), { ...visit, placeId: 'p9', ...now() });
+    await assertSucceeds(batch.commit());
+  });
+
+  it('посещение нельзя перенести к другому месту', async () => {
+    await assertSucceeds(setDoc(doc(member(), 'places/p1'), { ...place, ...now() }));
+    await assertSucceeds(setDoc(doc(member(), 'places/p2'), { ...place, ...now() }));
+    const ref = doc(member(), 'placeVisits/v1');
+    await assertSucceeds(setDoc(ref, { ...visit, ...now() }));
+    await assertSucceeds(updateDoc(ref, { milaRating: 10, updatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { placeId: 'p2', updatedAt: serverTimestamp() }));
   });
 });

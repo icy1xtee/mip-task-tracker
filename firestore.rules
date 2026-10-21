@@ -221,5 +221,58 @@ service cloud.firestore {
       allow create: if isMember() && validLink() && createdNow();
       allow update: if isMember() && validLink() && updatedNow();
     }
+
+    // ---- места ----
+
+    // У найденного места есть внешний id OSM («N123»), у ручной точки — нет.
+    function validPlace() {
+      let d = data();
+      return exactKeys(['provider', 'providerPlaceId', 'name', 'address', 'city', 'latitude', 'longitude', 'category', 'status', 'note', 'createdAt', 'updatedAt'])
+        && d.provider in ['osm', 'manual']
+        && (d.provider == 'manual'
+          ? d.providerPlaceId == null
+          : d.providerPlaceId is string && d.providerPlaceId.matches('^[NWR][0-9]{1,20}$'))
+        && text(d.name, 200)
+        && optText(d.address, 300)
+        && optText(d.city, 100)
+        && d.latitude is number && d.latitude >= -90 && d.latitude <= 90
+        && d.longitude is number && d.longitude >= -180 && d.longitude <= 180
+        && d.category in ['restaurant', 'cafe', 'bar', 'cinema', 'museum', 'park', 'shop', 'entertainment', 'other']
+        && d.status in ['want-to-visit', 'visited']
+        && optText(d.note, 2000);
+    }
+
+    match /places/{id} {
+      allow read, delete: if isMember();
+      allow create: if isMember() && validPlace() && createdNow();
+      allow update: if isMember() && validPlace() && updatedNow();
+    }
+
+    function optScore(v) {
+      return v == null || (v is int && v >= 1 && v <= 10);
+    }
+
+    function validVisit() {
+      let d = data();
+      return exactKeys(['placeId', 'date', 'spentMinor', 'pavelRating', 'milaRating', 'pavelReturnScore', 'milaReturnScore', 'note', 'createdAt', 'updatedAt'])
+        && text(d.placeId, 128)
+        && isDate(d.date)
+        && optMoney(d.spentMinor)
+        && optScore(d.pavelRating)
+        && optScore(d.milaRating)
+        && optScore(d.pavelReturnScore)
+        && optScore(d.milaReturnScore)
+        && optText(d.note, 2000);
+    }
+
+    // Посещение создаётся только для существующего места (или места из того же batch)
+    // и не переезжает к другому месту.
+    match /placeVisits/{id} {
+      allow read, delete: if isMember();
+      allow create: if isMember() && validVisit() && createdNow()
+        && existsAfter(/databases/$(database)/documents/places/$(data().placeId));
+      allow update: if isMember() && validVisit() && updatedNow()
+        && data().placeId == resource.data.placeId;
+    }
   }
 }

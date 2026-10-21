@@ -103,3 +103,39 @@ export type LinkItem = Audit & {
   type: LinkType;
   tags: string[];
 };
+
+/** Откуда место: найдено через поиск OpenStreetMap (Photon) или поставлено точкой вручную. */
+export type PlaceProvider = 'osm' | 'manual';
+export type PlaceStatus = 'want-to-visit' | 'visited';
+export type PlaceCategory =
+  'restaurant' | 'cafe' | 'bar' | 'cinema' | 'museum' | 'park' | 'shop' | 'entertainment' | 'other';
+
+/**
+ * Место на общей карте. Из внешней базы хранится только минимум для отображения;
+ * актуальные подробности (сайт, часы работы) запрашиваются по providerPlaceId.
+ */
+export type Place = Audit & {
+  provider: PlaceProvider;
+  /** OSM-объект вида «N123» / «W456» / «R789»; у ручной точки — null. */
+  providerPlaceId: string | null;
+  name: string;
+  address: string | null;
+  city: string | null;
+  latitude: number;
+  longitude: number;
+  category: PlaceCategory;
+  status: PlaceStatus;
+  note: string | null;
+};
+
+/** Одно посещение места. Оценки 1–10 у каждого партнёра свои; общие значения вычисляются. */
+export type PlaceVisit = Audit & {
+  placeId: string;
+  date: IsoDate;
+  spentMinor: number | null;
+  pavelRating: number | null;
+  milaRating: number | null;
+  pavelReturnScore: number | null;
+  milaReturnScore: number | null;
+  note: string | null;
+};

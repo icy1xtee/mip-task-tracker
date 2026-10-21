@@ -2733,3 +2733,679 @@ button.acc:focus-visible,
     transition: none;
   }
 }
+
+/* ---- Места: карта + список (features/places) ---- */
+/* Шестой раздел в нижней навигации телефона. */
+.tabbar {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.tabbar .tab-ic {
+  width: 48px;
+}
+.notice-accent {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.panel-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+/* Страница во всю высоту: карта занимает всё, что осталось под поиском. */
+.page-places {
+  height: 100%;
+  min-height: 560px;
+  max-width: 1600px;
+  padding-bottom: 32px;
+  gap: 20px;
+}
+.places-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: none;
+}
+.places-bar .psearch {
+  flex: 1;
+  max-width: 560px;
+}
+.places-mode {
+  display: none;
+}
+.places {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 20px;
+}
+.places-side {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 2px 4px 2px 2px;
+  margin: -2px -4px -2px -2px;
+}
+.places-side .chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: none;
+}
+.places-tools {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+.places-tools .select-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.places-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  flex: none;
+}
+.places-filters .textlink {
+  align-self: flex-start;
+  margin-bottom: 6px;
+}
+.places-side .list {
+  flex: none;
+}
+.places-map {
+  position: relative;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--sunk);
+}
+.places-map > .loading {
+  height: 100%;
+}
+/* Специфичнее .maplibregl-map: CSS MapLibre подгружается позже и ставит position: relative. */
+.places-map > .pmap {
+  position: absolute;
+  inset: 0;
+}
+.pmap-fallback {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.pmap .maplibregl-ctrl-group {
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+  border: 1px solid var(--line);
+}
+.pmap .maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+/* Легенда и подсказка режима «поставить точку» — поверх карты, слева сверху. */
+.pmap-legend,
+.pmap-banner {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+.pmap-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pmap-banner {
+  right: 56px;
+  max-width: 460px;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink);
+  border-color: var(--accent-line);
+  min-height: 42px;
+}
+.pmap-banner > .ic {
+  color: var(--accent);
+}
+.pmap-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+/* Точки — как на карте: были — заливка, хотим — кольцо, любимые — крупнее. */
+.pdot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--accent);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 3px var(--line);
+}
+.pdot-want {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2.5px var(--accent);
+}
+.pdot-favorite {
+  width: 15px;
+  height: 15px;
+  box-shadow:
+    0 0 0 2.5px var(--surface),
+    0 0 0 3.5px var(--accent-line);
+}
+/* Строка списка мест. */
+.prow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 14px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.list > .prow:first-child {
+  border-top: 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.list > .prow:last-child {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+.list > .prow:only-child {
+  border-radius: var(--r-lg);
+}
+.prow:hover {
+  background: var(--hover);
+}
+.prow.is-sel {
+  background: var(--accent-soft);
+}
+.prow:focus-visible,
+.prec:focus-visible,
+.score-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.prow-name {
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pscores-inline,
+.ppeek-facts {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: none;
+}
+.pscores-inline > span,
+.ppeek-facts > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.pscores-inline .ic,
+.ppeek-facts .ic {
+  width: 14px;
+  height: 14px;
+}
+.pscores-inline > span:first-child .ic,
+.ppeek-facts > span:first-child .ic {
+  color: var(--accent);
+}
+.ppeek-facts .muted {
+  font-weight: 500;
+}
+/* Краткая карточка по клику на точку — поверх карты внизу. */
+.ppeek {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 340px;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 8px 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+  animation: rise 0.18s ease-out;
+}
+.ppeek-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+.ppeek-top .pdot {
+  margin-top: 6px;
+}
+.ppeek-name {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+}
+.ppeek-top .icon-btn {
+  margin-top: -6px;
+}
+/* «Вам стоит сходить сюда снова». */
+.precs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: none;
+}
+.precs .h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.precs .h3 .ic {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+.precs-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.precs-row > .prec:only-child {
+  flex-basis: 100%;
+}
+.prec {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 0 0 272px;
+  min-width: 0;
+  scroll-snap-align: start;
+  padding: 10px 14px 12px;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.prec:hover {
+  background: var(--accent-soft);
+}
+.prec-name {
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prec-why {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+/* Поиск с выпадающим списком. */
+.psearch {
+  position: relative;
+  min-width: 0;
+}
+.psearch-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+}
+.psearch-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.psearch-group {
+  padding: 8px 10px 4px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 550;
+  color: var(--ink-3);
+}
+.psearch-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+.psearch-opt.is-active {
+  background: var(--hover);
+}
+.psearch-opt > .ic {
+  margin-top: 3px;
+  color: var(--ink-3);
+}
+.psearch-name {
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.psearch-meta {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.psearch-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.psearch-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--line);
+}
+/* Оценки 1–10 в форме посещения. */
+.score-block {
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.score-who {
+  padding: 0 6px;
+  margin-left: -6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.score-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.score-pick {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+}
+.score-btn {
+  height: 34px;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--field);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.score-btn:hover {
+  border-color: var(--accent-line);
+  color: var(--ink);
+}
+.score-btn.is-fill {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-ink);
+}
+.score-btn.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+/* Карточка места. */
+.psheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: -8px;
+}
+.psheet-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pscores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.pscore {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  background: var(--sunk);
+  border-radius: var(--r-md);
+}
+.pscore-val {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.pscore-val .ic {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+.ppartners {
+  display: flex;
+  flex-direction: column;
+}
+.ppartners-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px 100px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.ppartners-head {
+  border-top: 0;
+  padding-top: 0;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 550;
+  color: var(--ink-3);
+}
+.ppartners-name {
+  font-weight: 550;
+}
+.psheet-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.psheet-note {
+  white-space: pre-line;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-2);
+}
+.pvisit {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 4px 10px 14px;
+  border-top: 1px solid var(--line);
+}
+.list > .pvisit:first-child {
+  border-top: 0;
+}
+.pvisit > .money {
+  margin-top: 8px;
+}
+.pvisit .row-main {
+  padding-top: 6px;
+  gap: 2px;
+}
+.pvisit-date {
+  font-weight: 550;
+}
+.pvisit-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.pvisit-scores > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.pvisit-scores .ic {
+  width: 13px;
+  height: 13px;
+  color: var(--ink-3);
+  margin-left: 4px;
+}
+.pvisit-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+/* Планшет и телефон: карта и список — переключателем, а не рядом. */
+@container main (max-width:880px) {
+  .places-mode {
+    display: block;
+    flex: none;
+    width: 200px;
+  }
+  .places {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .places.is-map .places-side,
+  .places.is-list .places-map {
+    display: none;
+  }
+}
+@container main (max-width:640px) {
+  .page-places {
+    padding: 12px 16px 16px;
+    gap: 12px;
+    min-height: 460px;
+  }
+  .page-places > .page-head {
+    display: none;
+  }
+  .places-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .places-bar .psearch {
+    max-width: none;
+  }
+  .places-mode {
+    width: auto;
+  }
+  .places-side .chips,
+  .precs-row {
+    margin: 0 -16px;
+    padding: 0 16px 2px;
+    scroll-padding: 0 16px;
+  }
+  .prec {
+    flex-basis: 78%;
+  }
+  .places-map {
+    margin: 0 -16px -16px;
+    border-radius: 0;
+    border-width: 1px 0 0;
+  }
+  .ppeek {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-width: none;
+  }
+  .ppeek .btn {
+    width: 100%;
+  }
+  .pmap-legend {
+    gap: 10px;
+    padding: 5px 8px;
+  }
+  .pmap-banner {
+    left: 10px;
+    right: 52px;
+  }
+  .ppartners-row {
+    grid-template-columns: minmax(0, 1fr) 92px 84px;
+  }
+}

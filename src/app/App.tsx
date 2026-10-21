@@ -7,6 +7,7 @@ import { BudgetPage } from '@/features/budget/BudgetPage';
 import { IdeasPage } from '@/features/ideas/IdeasPage';
 import { LinksPage } from '@/features/links/LinksPage';
 import { OverviewPage } from '@/features/overview/OverviewPage';
+import { PlacesPage } from '@/features/places/PlacesPage';
 import { TasksPage } from '@/features/tasks/TasksPage';
 import { firebaseConfig } from '@/lib/firebase/client';
 import { ConfigErrorScreen } from './ConfigErrorScreen';
@@ -26,6 +27,7 @@ export function App() {
               <Route path="ideas" element={<IdeasPage />} />
               <Route path="budget" element={<BudgetPage tab="plan" />} />
               <Route path="budget/actual" element={<BudgetPage tab="actual" />} />
+              <Route path="places" element={<PlacesPage />} />
               <Route path="links" element={<LinksPage />} />
             </Route>
           </Route>
