@@ -27,7 +27,7 @@ export function statusTag(
   const when = a.plannedDate ? ` · ${formatDayMonthShort(a.plannedDate, today)}` : '';
   switch (a.status) {
     case 'booked':
-      return { label: `Забронировано${when}`, tone: 'sage', icon: 'check' };
+      return { label: `Забронировано${when}`, tone: 'positive', icon: 'check' };
     case 'completed':
       return { label: `Сходили${when}`, tone: 'neutral', icon: 'check' };
     case 'archived':

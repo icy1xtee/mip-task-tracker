@@ -14,9 +14,11 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
-  --color-sage: var(--sage);
-  --color-sage-ink: var(--sage-ink);
-  --color-sage-soft: var(--sage-soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
   --color-clay: var(--clay);
   --color-clay-soft: var(--clay-soft);
   --color-amber: var(--amber);

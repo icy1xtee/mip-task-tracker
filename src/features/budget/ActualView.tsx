@@ -383,7 +383,7 @@ function Months({ s }: { s: ActualSummary }) {
           </span>
         )}
         <span>
-          <span className="lg-sw" style={{ background: 'var(--sage)' }} />
+          <span className="lg-sw" style={{ background: 'var(--accent)' }} />
           {formatMonthName(s.month)}
           {s.isCurrent ? `, 1–${s.periodEndDay}` : ''}
         </span>

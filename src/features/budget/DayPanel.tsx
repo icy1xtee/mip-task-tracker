@@ -38,7 +38,7 @@ export function DayPanel({ date, today, input, items, menuFor, onPlan }: DayPane
           </h2>
         </div>
         {isPast && <Tag>День прошёл</Tag>}
-        {isToday && <Tag tone="sage">Сегодня</Tag>}
+        {isToday && <Tag tone="accent">Сегодня</Tag>}
       </div>
 
       {isPast ? (

@@ -14,17 +14,22 @@
   --ink: #22241f;
   --ink-2: #575a52;
   --ink-3: #6a6c64;
-  --sage: #57735d;
-  --sage-hover: #4a6450;
-  --sage-press: #3f5745;
-  --sage-ink: #43604a;
-  --sage-soft: #e4ebe1;
+  /* Акцент — главное действие, выбор, фокус, бренд. */
+  --accent: #ba1748;
+  --accent-hover: #a0143e;
+  --accent-press: #881135;
+  --accent-ink: #a71541;
+  --accent-soft: #f6e1e7;
+  --accent-line: #e2acb6;
+  /* Позитивный статус — доходы, «сделано / подтверждено», снижение трат. Не путать с акцентом. */
+  --positive: #43604a;
+  --positive-soft: #e4ebe1;
   --clay: #9c4529;
   --clay-hover: #86391f;
   --clay-soft: #f4e4da;
   --amber: #8a5d0e;
   --amber-soft: #f3e7cc;
-  --chart: #6f8b74;
+  --chart: #d06a86;
   --bar-past: #8f887a;
   --hover: rgba(34, 36, 31, 0.05);
   --r-sm: 6px;
@@ -106,14 +111,14 @@ html {
   white-space: nowrap;
 }
 .money.in {
-  color: var(--sage-ink);
+  color: var(--positive);
 }
 .money.out-c,
 .money.debt {
   color: var(--clay);
 }
 .in {
-  color: var(--sage-ink);
+  color: var(--positive);
 }
 .out {
   color: var(--clay);
@@ -198,7 +203,7 @@ html {
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: var(--sage);
+  background: var(--accent);
   color: #fff;
   display: grid;
   place-items: center;
@@ -244,7 +249,7 @@ html {
   box-shadow: inset 0 0 0 1px var(--line);
 }
 .nav-item.is-active .ic {
-  color: var(--sage);
+  color: var(--accent);
 }
 .side-foot {
   margin-top: auto;
@@ -352,8 +357,8 @@ html {
   color: var(--ink);
 }
 .tab.is-active .tab-ic {
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 .btn {
   display: inline-flex;
@@ -391,16 +396,16 @@ html {
   height: 16px;
 }
 .btn-primary {
-  background: var(--sage);
+  background: var(--accent);
   color: #fff;
 }
 .btn-primary:hover:not(:disabled),
 .btn-primary.is-hover {
-  background: var(--sage-hover);
+  background: var(--accent-hover);
 }
 .btn-primary:active:not(:disabled),
 .btn-primary.is-active {
-  background: var(--sage-press);
+  background: var(--accent-press);
 }
 .btn-secondary {
   background: var(--surface);
@@ -462,7 +467,7 @@ html {
 .col:focus-visible,
 .toast-btn:focus-visible,
 .subtab:focus-visible {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .btn:disabled,
@@ -506,12 +511,12 @@ html {
   cursor: not-allowed;
 }
 .icon-btn-primary {
-  background: var(--sage);
+  background: var(--accent);
   color: #fff;
   border-radius: 12px;
 }
 .icon-btn-primary:hover:not(:disabled) {
-  background: var(--sage-hover);
+  background: var(--accent-hover);
   color: #fff;
 }
 .textlink {
@@ -524,7 +529,7 @@ html {
   font: inherit;
   font-size: 14px;
   font-weight: 550;
-  color: var(--sage-ink);
+  color: var(--accent-ink);
   text-decoration: none;
   cursor: pointer;
   border-radius: 4px;
@@ -576,8 +581,8 @@ html {
 .input:focus,
 .input.is-focus {
   outline: none;
-  border-color: var(--sage);
-  box-shadow: 0 0 0 3px rgba(87, 115, 93, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(186, 23, 72, 0.2);
 }
 .input.is-error {
   border-color: var(--clay);
@@ -679,7 +684,7 @@ select.input {
 .inline-check input {
   width: 18px;
   height: 18px;
-  accent-color: #57735d;
+  accent-color: #ba1748;
   margin: 0;
 }
 .seg {
@@ -785,9 +790,9 @@ select.input {
   height: 13px;
   stroke-width: 2.2;
 }
-.tag-sage {
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+.tag-positive {
+  background: var(--positive-soft);
+  color: var(--positive);
 }
 .tag-clay {
   background: var(--clay-soft);
@@ -924,12 +929,12 @@ select.input {
   opacity: 0;
 }
 .check:hover .check-box {
-  border-color: var(--sage);
+  border-color: var(--accent);
 }
 .check input:checked + .check-box,
 .check-box.is-on {
-  background: var(--sage);
-  border-color: var(--sage);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .check input:checked + .check-box .ic,
 .check-box.is-on .ic {
@@ -937,7 +942,7 @@ select.input {
 }
 .check input:focus-visible + .check-box,
 .check-box.is-focus {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .check-box.is-disabled {
@@ -1071,8 +1076,8 @@ select.input {
   stroke-width: 2.2;
 }
 .op-ic.in {
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+  background: var(--positive-soft);
+  color: var(--positive);
 }
 .op-ic.out {
   background: var(--clay-soft);
@@ -1160,8 +1165,8 @@ select.input {
     box-shadow 0.2s;
 }
 .card.is-picked {
-  border-color: var(--sage);
-  box-shadow: 0 0 0 3px rgba(87, 115, 93, 0.16);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(186, 23, 72, 0.16);
 }
 .card-top {
   display: flex;
@@ -1212,8 +1217,8 @@ select.input {
   gap: 24px;
   padding: 20px 20px 20px 24px;
   border-radius: var(--r-lg);
-  background: var(--sage-soft);
-  border: 1px solid #cbd8c7;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
   animation: rise 0.4s ease-out;
 }
 .pick-main {
@@ -1228,7 +1233,7 @@ select.input {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--sage-ink);
+  color: var(--accent-ink);
   font-weight: 550;
 }
 .pick-label .ic {
@@ -1390,8 +1395,8 @@ select.input {
   font-weight: 600;
 }
 .day.is-sel {
-  background: var(--sage-soft);
-  border-color: #afc2ab;
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
 }
 .day-blank {
   height: 86px;
@@ -1432,8 +1437,8 @@ select.input {
 }
 .mk-sign.in,
 .mk-sign.always.in {
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+  background: var(--positive-soft);
+  color: var(--positive);
 }
 .mk-sign.out,
 .mk-sign.always.out {
@@ -1576,7 +1581,7 @@ select.input {
   color: var(--clay);
 }
 .delta.down {
-  color: var(--sage-ink);
+  color: var(--positive);
 }
 .delta.flat {
   color: var(--ink-3);
@@ -1611,8 +1616,8 @@ select.input {
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  border: 1.5px dashed var(--sage);
-  background: repeating-linear-gradient(135deg, rgba(87, 115, 93, 0.18) 0 3px, transparent 3px 6px);
+  border: 1.5px dashed var(--accent);
+  background: repeating-linear-gradient(135deg, rgba(186, 23, 72, 0.18) 0 3px, transparent 3px 6px);
   display: inline-block;
 }
 .lg-dash {
@@ -1707,16 +1712,16 @@ select.input {
   transition: background-color 0.12s;
 }
 .col.is-cur .col-bar {
-  background: var(--sage);
+  background: var(--accent);
   border-radius: 0;
 }
 .col-proj {
   width: 100%;
   max-width: 44px;
-  border: 1.5px dashed var(--sage);
+  border: 1.5px dashed var(--accent);
   border-bottom: 0;
   border-radius: 4px 4px 0 0;
-  background: repeating-linear-gradient(135deg, rgba(87, 115, 93, 0.16) 0 4px, transparent 4px 8px);
+  background: repeating-linear-gradient(135deg, rgba(186, 23, 72, 0.16) 0 4px, transparent 4px 8px);
 }
 .col.is-hover .col-val {
   color: var(--ink);
@@ -1726,7 +1731,7 @@ select.input {
   background: #6f695c;
 }
 .col.is-cur.is-hover .col-bar {
-  background: var(--sage-hover);
+  background: var(--accent-hover);
 }
 .avg {
   position: absolute;
@@ -1816,8 +1821,8 @@ select.input {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
   display: grid;
   place-items: center;
 }
@@ -1950,7 +1955,7 @@ select.input {
   white-space: nowrap;
 }
 .toast > .ic {
-  color: #a9c4ad;
+  color: #e5a7b9;
   width: 18px;
   height: 18px;
 }
@@ -2361,8 +2366,8 @@ select.input {
   color: var(--clay);
 }
 .notice-info {
-  background: var(--sage-soft);
-  color: var(--sage-ink);
+  background: var(--positive-soft);
+  color: var(--positive);
 }
 .notice-warn {
   background: var(--amber-soft);
@@ -2420,7 +2425,7 @@ button.acc:hover {
 }
 button.acc:focus-visible,
 .op-btn:focus-visible {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .acc-add {
@@ -2672,4 +2677,10 @@ button.acc:focus-visible,
   .link-row .link-copy {
     display: none;
   }
+}
+
+/* Тег в цвет акцента (например, «Сегодня» в панели дня). */
+.tag-accent {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }

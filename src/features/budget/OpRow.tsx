@@ -29,7 +29,7 @@ export function OpRow({ item, meta, menu }: OpRowProps) {
         <div className="op-title">{item.title}</div>
         <div className="row-meta">
           {item.status === 'completed' && (
-            <Tag tone="sage" icon="check">
+            <Tag tone="positive" icon="check">
               {income ? 'Получено' : 'Оплачено'}
             </Tag>
           )}

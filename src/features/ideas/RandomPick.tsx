@@ -55,7 +55,7 @@ export function RandomPick({
           </Button>
         )}
         {idea.status === 'booked' && (
-          <Tag tone="sage" icon="check">
+          <Tag tone="positive" icon="check">
             Забронировано
           </Tag>
         )}

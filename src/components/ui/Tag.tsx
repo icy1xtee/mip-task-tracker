@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { cx } from './cx';
 import { Icon, type IconName } from './Icon';
 
-export type TagTone = 'neutral' | 'sage' | 'clay' | 'amber' | 'outline';
+export type TagTone = 'neutral' | 'positive' | 'accent' | 'clay' | 'amber' | 'outline';
 
 export function Tag({
   tone = 'neutral',
