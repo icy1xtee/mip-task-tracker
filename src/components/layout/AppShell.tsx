@@ -15,12 +15,12 @@ export function Brand() {
   return (
     <div className="brand">
       <span className="brand-mark" aria-hidden="true">
-        m
+        ⊹ ࣪
       </span>
       <span className="brand-text">
         <span className="brand-name">mip</span>
         <br />
-        <span className="brand-sub">наше общее</span>
+        <span className="brand-sub">task tracker</span>
       </span>
     </div>
   );
