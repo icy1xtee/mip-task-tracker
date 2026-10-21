@@ -1,0 +1,115 @@
+import type { PetSkin } from './petEngine';
+
+/*
+ * Собачка mip — пшеничный терьер с бородой и бровями, в фиолетовом ошейнике, смотрит вправо.
+ * Кадр — строки одинаковой длины, символ = ключ палитры, «.» — прозрачно.
+ */
+export const DOG_SKIN: PetSkin = {
+  palette: {
+    '.': null,
+    F: '#C9A577',
+    f: '#A3804F',
+    L: '#E4CDA6',
+    N: '#22241F',
+    C: '#6E3FB8',
+    T: '#E46A86',
+  },
+  size: { w: 16, h: 12 },
+  frames: {
+    // Стоит и виляет хвостом.
+    idle: [
+      [
+        '................',
+        '........ffFFF...',
+        '........fFLLFF..',
+        '........FFFNFFF.',
+        '..F.....FFFFFFFN',
+        '..F.....FFLLLLL.',
+        '..F.....CCLLLL..',
+        '..FFFFFFFFFFF...',
+        '..FFFFFFFFFFF...',
+        '..fFFFFFFFFFF...',
+        '..FFf....FFf....',
+        '..LLf....LLf....',
+      ],
+      [
+        '................',
+        '........ffFFF...',
+        '........fFLLFF..',
+        '........FFFNFFF.',
+        '.F......FFFFFFFN',
+        '..F.....FFLLLLL.',
+        '..F.....CCLLLL..',
+        '..FFFFFFFFFFF...',
+        '..FFFFFFFFFFF...',
+        '..fFFFFFFFFFF...',
+        '..FFf....FFf....',
+        '..LLf....LLf....',
+      ],
+    ],
+    walk: [
+      [
+        '................',
+        '........ffFFF...',
+        '........fFLLFF..',
+        '........FFFNFFF.',
+        '..F.....FFFFFFFN',
+        '..F.....FFLLLLL.',
+        '..F.....CCLLLL..',
+        '..FFFFFFFFFFF...',
+        '..FFFFFFFFFFF...',
+        '..fFFFFFFFFFF...',
+        '.FF.f...FF..f...',
+        '.LL...f.LL....f.',
+      ],
+      [
+        '................',
+        '........ffFFF...',
+        '........fFLLFF..',
+        '........FFFNFFF.',
+        '..F.....FFFFFFFN',
+        '..F.....FFLLLLL.',
+        '..F.....CCLLLL..',
+        '..FFFFFFFFFFF...',
+        '..FFFFFFFFFFF...',
+        '..fFFFFFFFFFF...',
+        '..FFf....FFf....',
+        '..LLf....LLf....',
+      ],
+    ],
+    // Держат за шкирку: глаза круглые, хвост поджат, лапы висят.
+    held: [
+      '................',
+      '........ffFFF...',
+      '........fFLLFF..',
+      '........FFLNFFF.',
+      '........FFFFFFFN',
+      '........FFLLLLL.',
+      '........CCLLLL..',
+      '..FFFFFFFFFFF...',
+      '.FFFFFFFFFFFF...',
+      'F.fFFFFFFFFFF...',
+      '..FF.....FF.....',
+      '..LL.....LL.....',
+    ],
+    // Радуется: хвост торчком, язык наружу.
+    happy: [
+      '................',
+      '........ffFFF...',
+      '..F.....fFLLFF..',
+      '..F.....FFFNFFF.',
+      '..F.....FFFFFFFN',
+      '..F.....FFLLLLT.',
+      '..F.....CCLLLLT.',
+      '..FFFFFFFFFFF...',
+      '..FFFFFFFFFFF...',
+      '..fFFFFFFFFFF...',
+      '..FFf....FFf....',
+      '..LLf....LLf....',
+    ],
+  },
+  messages: {
+    tap: ['Woof!', 'Bark!', 'Почеши за ухом', 'Гулять?'],
+    cheer: ['Woof!', 'Bark!', 'мама спасибо за шарики'],
+  },
+};
