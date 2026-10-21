@@ -1,53 +1,24 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+/* Дизайн-система — вне слоёв, чтобы утилиты Tailwind с совпадающими именами (.block и т.п.) её не перебивали. */
+@import './styles/mip.css';
 
-/*
- * Дизайн-токены «Вместе».
- * Временная палитра по брифу (тёплый нейтральный фон, графит, приглушённый зелёный,
- * янтарь/терракота для предупреждений и расходов). Когда в .claude/design-prototype
- * появятся макеты — значения берутся оттуда, имена токенов по возможности сохраняются.
- */
-@theme {
-  --font-sans:
-    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-
-  --color-canvas: #f6f3ee;
-  --color-surface: #fffdf9;
-  --color-surface-muted: #efeae2;
-  --color-line: #e3ddd3;
-  --color-line-strong: #cfc7ba;
-
-  --color-ink: #2b2a28;
-  --color-ink-muted: #6b665e;
-  --color-ink-subtle: #8f897f;
-
-  --color-accent: #4f7a5c;
-  --color-accent-strong: #3f6449;
-  --color-accent-soft: #e4ede5;
-  --color-on-accent: #fffdf9;
-
-  --color-warn: #a86a12;
-  --color-warn-soft: #f7ecd9;
-  --color-danger: #b0502f;
-  --color-danger-soft: #f6e3dc;
-
-  --color-income: var(--color-accent);
-  --color-expense: var(--color-danger);
-
-  --radius-control: 0.625rem;
-  --radius-panel: 1rem;
-}
-
-@layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    @apply bg-canvas text-ink font-sans antialiased;
-  }
-
-  :focus-visible {
-    @apply outline-accent outline-2 outline-offset-2;
-  }
+/* Утилиты Tailwind используют токены дизайн-системы (единый источник — :root в mip.css). */
+@theme inline {
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-sage: var(--sage);
+  --color-sage-ink: var(--sage-ink);
+  --color-sage-soft: var(--sage-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
 }

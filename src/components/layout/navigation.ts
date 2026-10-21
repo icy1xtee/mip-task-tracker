@@ -1,11 +1,11 @@
-import { CalendarCheck, House, Link2, Sparkles, Wallet, type LucideIcon } from 'lucide-react';
+import type { IconName } from '@/components/ui/Icon';
 
-export type NavItem = { to: string; label: string; icon: LucideIcon };
+export type NavItem = { to: string; label: string; icon: IconName; end?: boolean };
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Обзор', icon: House },
-  { to: '/tasks', label: 'Дела', icon: CalendarCheck },
-  { to: '/ideas', label: 'Идеи', icon: Sparkles },
-  { to: '/budget', label: 'Бюджет', icon: Wallet },
-  { to: '/links', label: 'Ссылки', icon: Link2 },
+  { to: '/', label: 'Обзор', icon: 'home', end: true },
+  { to: '/tasks', label: 'Дела', icon: 'tasks' },
+  { to: '/ideas', label: 'Идеи', icon: 'idea' },
+  { to: '/budget', label: 'Бюджет', icon: 'wallet' },
+  { to: '/links', label: 'Ссылки', icon: 'link' },
 ];

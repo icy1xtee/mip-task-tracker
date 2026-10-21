@@ -1,20 +1,25 @@
 import type { ReactNode } from 'react';
 
 type PageHeaderProps = {
+  eyebrow?: string;
   title: string;
-  description?: string;
-  /** Единственный доминирующий CTA экрана. */
-  action?: ReactNode;
+  lead?: ReactNode;
+  /** Кнопки шапки. Основной CTA обычно скрыт на телефоне — там его роль у «+» в верхней панели. */
+  actions?: ReactNode;
+  actionsMobile?: boolean;
 };
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, lead, actions, actionsMobile }: PageHeaderProps) {
   return (
-    <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="text-ink text-2xl font-semibold tracking-tight">{title}</h1>
-        {description && <p className="text-ink-muted mt-1 text-sm">{description}</p>}
+    <div className={lead || actionsMobile ? 'page-head' : 'page-head hide-m'}>
+      <div>
+        {eyebrow && <div className="eyebrow hide-m">{eyebrow}</div>}
+        <h1 className="h1 hide-m">{title}</h1>
+        {lead && <p className="lead">{lead}</p>}
       </div>
-      {action}
-    </header>
+      {actions && (
+        <div className={actionsMobile ? 'ph-actions' : 'ph-actions hide-m'}>{actions}</div>
+      )}
+    </div>
   );
 }

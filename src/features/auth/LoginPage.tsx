@@ -4,10 +4,11 @@ import { useForm } from 'react-hook-form';
 import { Navigate, useLocation } from 'react-router';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
-import { Field, Input } from '@/components/ui/Field';
-import { LoadingState } from '@/components/ui/StateViews';
+import { Field, TextInput } from '@/components/ui/Field';
+import { Icon } from '@/components/ui/Icon';
 import { getErrorMessage } from '@/lib/firebase/errors';
 import { requestPasswordReset, signIn } from './api';
+import { BootScreen } from './RequireAuth';
 import { useAuth } from './useAuth';
 
 const schema = z.object({
@@ -32,7 +33,7 @@ export function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
-  if (auth.status === 'loading') return <LoadingState />;
+  if (auth.status === 'loading') return <BootScreen />;
   if (auth.status === 'signedIn') {
     const from = (location.state as { from?: string } | null)?.from ?? '/';
     return <Navigate to={from} replace />;
@@ -66,50 +67,71 @@ export function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
-        <h1 className="text-ink text-3xl font-semibold tracking-tight">Вместе</h1>
-        <p className="text-ink-muted mt-2 text-sm">Войдите в общий аккаунт, чтобы продолжить.</p>
+    <div className="mip">
+      <main className="auth">
+        <div className="auth-card">
+          <div className="auth-brand">
+            <span className="brand-mark" aria-hidden="true">
+              m
+            </span>
+            <div>
+              <div className="brand-name">mip</div>
+              <div className="brand-sub">наше общее</div>
+            </div>
+          </div>
+          <div>
+            <h1 className="h1">Вход</h1>
+            <p className="lead">Войдите в общий аккаунт, чтобы продолжить.</p>
+          </div>
 
-        <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-4">
-          <Field label="Email" error={errors.email?.message}>
-            {(props) => (
-              <Input {...props} type="email" autoComplete="username" {...register('email')} />
-            )}
-          </Field>
-          <Field label="Пароль" error={errors.password?.message}>
-            {(props) => (
-              <Input
-                {...props}
-                type="password"
-                autoComplete="current-password"
-                {...register('password')}
-              />
-            )}
-          </Field>
+          <form
+            onSubmit={onSubmit}
+            noValidate
+            style={{ display: 'flex', flexDirection: 'column', gap: 18 }}
+          >
+            <Field label="Email" error={errors.email?.message}>
+              {(p) => (
+                <TextInput {...p} type="email" autoComplete="username" {...register('email')} />
+              )}
+            </Field>
+            <Field label="Пароль" error={errors.password?.message}>
+              {(p) => (
+                <TextInput
+                  {...p}
+                  type="password"
+                  autoComplete="current-password"
+                  {...register('password')}
+                />
+              )}
+            </Field>
 
-          {submitError && (
-            <p
-              role="alert"
-              className="rounded-control bg-danger-soft text-danger px-3 py-2 text-sm"
+            {submitError && (
+              <div className="notice notice-error" role="alert">
+                <Icon name="alert" />
+                {submitError}
+              </div>
+            )}
+            {resetNotice && (
+              <div className="notice notice-info" role="status">
+                <Icon name="check" />
+                {resetNotice}
+              </div>
+            )}
+
+            <Button type="submit" pending={isSubmitting} pendingLabel="Входим…">
+              Войти
+            </Button>
+            <Button
+              variant="ghost"
+              pending={resetPending}
+              pendingLabel="Отправляем…"
+              onClick={onResetPassword}
             >
-              {submitError}
-            </p>
-          )}
-          {resetNotice && (
-            <p role="status" className="rounded-control bg-accent-soft text-ink px-3 py-2 text-sm">
-              {resetNotice}
-            </p>
-          )}
-
-          <Button type="submit" pending={isSubmitting} className="mt-2">
-            Войти
-          </Button>
-          <Button variant="ghost" pending={resetPending} onClick={onResetPassword}>
-            Забыли пароль?
-          </Button>
-        </form>
-      </div>
-    </main>
+              Забыли пароль?
+            </Button>
+          </form>
+        </div>
+      </main>
+    </div>
   );
 }

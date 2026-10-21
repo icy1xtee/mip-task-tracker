@@ -1,64 +1,90 @@
-import { Slot } from 'radix-ui';
 import type { ComponentProps } from 'react';
-import { cn } from '@/lib/cn';
-import { Spinner } from './Spinner';
-
-const VARIANTS = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-strong',
-  secondary: 'border border-line-strong bg-surface text-ink hover:bg-surface-muted',
-  ghost: 'text-ink-muted hover:bg-surface-muted hover:text-ink',
-  danger: 'bg-danger text-on-accent hover:brightness-95',
-} as const;
-
-const SIZES = {
-  md: 'min-h-11 px-4 text-sm',
-  sm: 'min-h-9 px-3 text-sm',
-  icon: 'size-11',
-} as const;
+import { buttonClass, type ButtonVariant } from './buttonClass';
+import { cx } from './cx';
+import { Icon, type IconName } from './Icon';
 
 type ButtonProps = ComponentProps<'button'> & {
-  variant?: keyof typeof VARIANTS;
-  size?: keyof typeof SIZES;
+  variant?: ButtonVariant;
+  size?: 'md' | 'sm';
+  icon?: IconName;
+  /** Показывает спиннер и текст «Сохраняем…»; кнопка недоступна. */
   pending?: boolean;
-  asChild?: boolean;
+  pendingLabel?: string;
 };
 
 export function Button({
   variant = 'primary',
   size = 'md',
+  icon,
   pending = false,
-  asChild = false,
+  pendingLabel = 'Сохраняем…',
   disabled,
   className,
   children,
+  type = 'button',
   ...props
 }: ButtonProps) {
-  const classes = cn(
-    'inline-flex items-center justify-center gap-2 rounded-control font-medium transition-colors',
-    'disabled:pointer-events-none disabled:opacity-60',
-    VARIANTS[variant],
-    SIZES[size],
-    className,
-  );
-
-  if (asChild) {
-    return (
-      <Slot.Root className={classes} {...props}>
-        {children}
-      </Slot.Root>
-    );
-  }
-
   return (
     <button
-      type="button"
-      className={classes}
+      type={type}
+      className={buttonClass(variant, size, className)}
       disabled={disabled || pending}
       aria-busy={pending || undefined}
       {...props}
     >
-      {pending && <Spinner className="size-4" />}
-      {children}
+      {pending ? (
+        <>
+          <span className="spinner" aria-hidden="true" />
+          {pendingLabel}
+        </>
+      ) : (
+        <>
+          {icon && <Icon name={icon} />}
+          {children}
+        </>
+      )}
     </button>
+  );
+}
+
+type IconButtonProps = ComponentProps<'button'> & {
+  icon: IconName;
+  label: string;
+  primary?: boolean;
+};
+
+export function IconButton({
+  icon,
+  label,
+  primary,
+  className,
+  type = 'button',
+  ...props
+}: IconButtonProps) {
+  return (
+    <button
+      type={type}
+      className={cx('icon-btn', primary && 'icon-btn-primary', className)}
+      aria-label={label}
+      title={label}
+      {...props}
+    >
+      <Icon name={icon} />
+    </button>
+  );
+}
+
+/** Ссылка-кнопка во внешний ресурс: всегда новая вкладка с безопасными атрибутами. */
+export function ExternalLink({
+  href,
+  className,
+  children,
+  ...props
+}: Omit<ComponentProps<'a'>, 'target' | 'rel'> & { href: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className} {...props}>
+      {children}
+      <span className="sr-only"> (в новой вкладке)</span>
+    </a>
   );
 }

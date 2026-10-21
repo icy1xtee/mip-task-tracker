@@ -1,12 +1,15 @@
 rules_version = '2';
 
-// Приватные данные «Вместе». Поведение по умолчанию — deny.
+// Приватные данные mip. Поведение по умолчанию — deny.
 // Доступ есть только у UID из allowlist; любой другой вошедший пользователь
 // (даже созданный в том же Firebase-проекте) ничего не прочитает и не запишет.
 //
 // Как заполнить allowlist: Firebase Console → Authentication → Users →
-// скопируйте «User UID» общей учётной записи и замените placeholder ниже.
-// Второго пользователя позже можно добавить в тот же список.
+// скопируйте «User UID» и добавьте в список ниже.
+//
+// Кроме доступа правила проверяют структуру документов: только известные поля,
+// базовые типы, enum-значения, целые копейки, даты YYYY-MM-DD и серверные метки времени.
+// Сложные расчёты (прогноз, повторы) живут в клиенте, не здесь.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -18,34 +21,202 @@ service cloud.firestore {
         ];
     }
 
-    // Коллекции приложения перечислены явно: неизвестные коллекции остаются закрытыми.
-    // Валидация полей добавляется вместе с реализацией каждой сущности.
+    // ---- общие проверки ----
+
+    function data() {
+      return request.resource.data;
+    }
+
+    function exactKeys(keys) {
+      return data().keys().hasOnly(keys) && data().keys().hasAll(keys);
+    }
+
+    function createdNow() {
+      return data().createdAt == request.time && data().updatedAt == request.time;
+    }
+
+    function updatedNow() {
+      return data().createdAt == resource.data.createdAt && data().updatedAt == request.time;
+    }
+
+    function text(v, max) {
+      return v is string && v.size() > 0 && v.size() <= max;
+    }
+
+    function optText(v, max) {
+      return v == null || text(v, max);
+    }
+
+    function isDate(v) {
+      return v is string && v.matches('^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$');
+    }
+
+    function optDate(v) {
+      return v == null || isDate(v);
+    }
+
+    function optMoney(v) {
+      return v == null || (v is int && v >= 0);
+    }
+
+    function positiveMoney(v) {
+      return v is int && v > 0;
+    }
+
+    function httpUrl(v) {
+      return v is string && v.size() <= 2000 && v.matches('^https?://.+');
+    }
+
+    function entryType(v) {
+      return v in ['income', 'expense'];
+    }
+
+    function planStatus(v) {
+      return v in ['planned', 'completed', 'skipped'];
+    }
+
+    // ---- коллекции ----
+
+    function validTask() {
+      let d = data();
+      return exactKeys(['title', 'description', 'dueDate', 'estimatedCostMinor', 'assignee', 'isCompleted', 'createdAt', 'updatedAt'])
+        && text(d.title, 200)
+        && optText(d.description, 2000)
+        && optDate(d.dueDate)
+        && optMoney(d.estimatedCostMinor)
+        && (d.assignee == null || d.assignee in ['me', 'partner', 'both'])
+        && d.isCompleted is bool;
+    }
+
     match /tasks/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validTask() && createdNow();
+      allow update: if isMember() && validTask() && updatedNow();
     }
+
+    function validActivity() {
+      let d = data();
+      return exactKeys(['title', 'description', 'url', 'estimatedCostMinor', 'status', 'needsBooking', 'plannedDate', 'createdAt', 'updatedAt'])
+        && text(d.title, 200)
+        && optText(d.description, 2000)
+        && (d.url == null || httpUrl(d.url))
+        && optMoney(d.estimatedCostMinor)
+        && d.status in ['wishlist', 'booked', 'completed', 'archived']
+        && d.needsBooking is bool
+        && optDate(d.plannedDate);
+    }
+
     match /activities/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validActivity() && createdNow();
+      allow update: if isMember() && validActivity() && updatedNow();
     }
+
+    function validAccount() {
+      let d = data();
+      return exactKeys(['name', 'type', 'openingBalanceMinor', 'balanceAsOfDate', 'createdAt', 'updatedAt'])
+        && text(d.name, 200)
+        && d.type in ['debit', 'credit', 'cash', 'savings', 'other']
+        && d.openingBalanceMinor is int
+        && isDate(d.balanceAsOfDate);
+    }
+
     match /accounts/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validAccount() && createdNow();
+      allow update: if isMember() && validAccount() && updatedNow();
     }
+
+    function validEntryFields(d) {
+      return text(d.title, 200)
+        && entryType(d.type)
+        && positiveMoney(d.amountMinor)
+        && text(d.accountId, 128)
+        && text(d.category, 40)
+        && optText(d.note, 500);
+    }
+
+    function validPlannedEntry() {
+      let d = data();
+      return exactKeys(['title', 'type', 'amountMinor', 'date', 'accountId', 'category', 'note', 'status', 'createdAt', 'updatedAt'])
+        && validEntryFields(d)
+        && isDate(d.date)
+        && planStatus(d.status);
+    }
+
     match /plannedEntries/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validPlannedEntry() && createdNow();
+      allow update: if isMember() && validPlannedEntry() && updatedNow();
     }
+
+    function validRule() {
+      let d = data();
+      return exactKeys(['title', 'type', 'amountMinor', 'accountId', 'category', 'note', 'frequency', 'startDate', 'endDate', 'dayOfMonth', 'createdAt', 'updatedAt'])
+        && validEntryFields(d)
+        && d.frequency in ['weekly', 'monthly', 'yearly']
+        && isDate(d.startDate)
+        && optDate(d.endDate)
+        && (d.endDate == null || d.endDate >= d.startDate)
+        && (d.dayOfMonth == null || (d.dayOfMonth is int && d.dayOfMonth >= 1 && d.dayOfMonth <= 31));
+    }
+
     match /recurringRules/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validRule() && createdNow();
+      allow update: if isMember() && validRule() && updatedNow();
     }
+
+    // id экземпляра детерминирован: «<ruleId>_<YYYY-MM-DD>» — один экземпляр на дату, без дублей.
+    function validOccurrence(id) {
+      let d = data();
+      return exactKeys(['ruleId', 'date', 'status', 'actualTransactionId', 'createdAt', 'updatedAt'])
+        && text(d.ruleId, 128)
+        && isDate(d.date)
+        && id == d.ruleId + '_' + d.date
+        && planStatus(d.status)
+        && optText(d.actualTransactionId, 128);
+    }
+
     match /recurringOccurrences/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validOccurrence(id) && createdNow();
+      allow update: if isMember() && validOccurrence(id) && updatedNow();
     }
+
+    function validTransaction() {
+      let d = data();
+      return exactKeys(['type', 'amountMinor', 'date', 'accountId', 'category', 'note', 'plannedEntryId', 'recurringOccurrenceId', 'createdAt', 'updatedAt'])
+        && entryType(d.type)
+        && positiveMoney(d.amountMinor)
+        && isDate(d.date)
+        && text(d.accountId, 128)
+        && text(d.category, 40)
+        && optText(d.note, 500)
+        && optText(d.plannedEntryId, 128)
+        && optText(d.recurringOccurrenceId, 200);
+    }
+
     match /transactions/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validTransaction() && createdNow();
+      allow update: if isMember() && validTransaction() && updatedNow();
     }
+
+    function validLink() {
+      let d = data();
+      return exactKeys(['title', 'url', 'description', 'type', 'tags', 'createdAt', 'updatedAt'])
+        && text(d.title, 200)
+        && httpUrl(d.url)
+        && optText(d.description, 300)
+        && d.type in ['workspace', 'document', 'spreadsheet', 'folder', 'other']
+        && d.tags is list && d.tags.size() <= 20;
+    }
+
     match /links/{id} {
-      allow read, write: if isMember();
-    }
-    match /appSettings/{id} {
-      allow read, write: if isMember();
+      allow read, delete: if isMember();
+      allow create: if isMember() && validLink() && createdNow();
+      allow update: if isMember() && validLink() && updatedNow();
     }
   }
 }

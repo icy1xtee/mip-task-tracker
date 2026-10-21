@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { formatIsoDate, isIsoDate, parseIsoDate, toIsoDate } from './dates';
+import {
+  addDaysIso,
+  addMonthsIso,
+  diffDays,
+  formatDayMonth,
+  formatDayMonthShort,
+  formatMonthYear,
+  formatWeekdayDayMonth,
+  isIsoDate,
+  monthEnd,
+  parseIsoDate,
+  toIsoDate,
+  weekdayIndex,
+} from './dates';
+
+const TODAY = '2026-10-20';
 
 describe('IsoDate helpers', () => {
   it('сохраняет календарный день при round-trip', () => {
@@ -21,7 +36,26 @@ describe('IsoDate helpers', () => {
     expect(isIsoDate('20.10.2026')).toBe(false);
   });
 
-  it('форматирует по-русски', () => {
-    expect(formatIsoDate('2026-10-20')).toBe('20 октября 2026');
+  it('считает дни и месяцы через границы', () => {
+    expect(addDaysIso('2026-10-31', 1)).toBe('2026-11-01');
+    expect(addDaysIso('2026-03-28', 2)).toBe('2026-03-30');
+    expect(diffDays('2026-10-20', '2026-10-18')).toBe(-2);
+    expect(addMonthsIso('2026-12', 1)).toBe('2027-01');
+    expect(addMonthsIso('2026-01', -1)).toBe('2025-12');
+    expect(monthEnd('2024-02')).toBe('2024-02-29');
+    expect(monthEnd('2026-02')).toBe('2026-02-28');
+  });
+
+  it('понедельник — первый день недели', () => {
+    expect(weekdayIndex('2026-10-19')).toBe(0);
+    expect(weekdayIndex('2026-10-25')).toBe(6);
+  });
+
+  it('форматирует по-русски, год — только если не текущий', () => {
+    expect(formatDayMonth('2026-10-25', TODAY)).toBe('25 октября');
+    expect(formatDayMonthShort('2026-10-25', TODAY)).toBe('25 окт');
+    expect(formatDayMonthShort('2027-01-05', TODAY)).toBe('5 янв 2027');
+    expect(formatWeekdayDayMonth('2026-10-20', TODAY)).toBe('Вторник, 20 октября');
+    expect(formatMonthYear('2026-10')).toBe('Октябрь 2026');
   });
 });

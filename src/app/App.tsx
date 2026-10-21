@@ -24,7 +24,8 @@ export function App() {
               <Route index element={<OverviewPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="ideas" element={<IdeasPage />} />
-              <Route path="budget" element={<BudgetPage />} />
+              <Route path="budget" element={<BudgetPage tab="plan" />} />
+              <Route path="budget/actual" element={<BudgetPage tab="actual" />} />
               <Route path="links" element={<LinksPage />} />
             </Route>
           </Route>
