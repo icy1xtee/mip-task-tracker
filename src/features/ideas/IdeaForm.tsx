@@ -10,13 +10,16 @@ import { useToast } from '@/components/ui/useToast';
 import { useConfirmDelete } from '@/components/ui/useConfirmDelete';
 import { getErrorMessage } from '@/lib/firebase/errors';
 import { todayIsoDate } from '@/lib/format/dates';
-import { minorToRublesInput } from '@/lib/format/money';
+import { isIsoDate } from '@/lib/format/dates';
+import { minorToRublesInput, parseRublesToMinor } from '@/lib/format/money';
+import { normalizeUrl } from '@/lib/format/url';
 import { optionalDate, optionalMoney, optionalText, optionalUrl, titleField } from '@/lib/forms';
 import type { Activity } from '@/types/models';
 import { createActivity, deleteActivity, updateActivity } from './api';
 import {
   applyBookingMode,
   bookingModeOf,
+  ideaCopyText,
   ideaDeleteCopy,
   statusTag,
   type BookingMode,
@@ -50,6 +53,7 @@ export function IdeaForm({ idea, onClose }: { idea: Activity | null; onClose: ()
   const {
     register,
     control,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
@@ -107,6 +111,26 @@ export function IdeaForm({ idea, onClose }: { idea: Activity | null; onClose: ()
         saving={isSubmitting}
         error={error}
         onDelete={idea ? () => del.ask(idea) : undefined}
+        copyText={
+          idea
+            ? () => {
+                // Копируем то, что сейчас в форме (в том числе несохранённые правки), без пустых полей.
+                const v = getValues();
+                const status =
+                  mode === null
+                    ? { status: idea.status, needsBooking: idea.needsBooking }
+                    : applyBookingMode(v.booking);
+                return ideaCopyText({
+                  title: v.title || idea.title,
+                  description: v.description.trim() || null,
+                  url: normalizeUrl(v.url),
+                  estimatedCostMinor: parseRublesToMinor(v.cost),
+                  plannedDate: isIsoDate(v.plannedDate) ? v.plannedDate : null,
+                  ...status,
+                });
+              }
+            : undefined
+        }
       >
         <Field label="Название" error={errors.title?.message}>
           {(p) => (

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Task } from '@/types/models';
 import {
+  taskCopyText,
   collectTags,
   describeDue,
   hasTag,
@@ -80,5 +81,45 @@ describe('разделы и поиск', () => {
     expect(matchesQuery(other, 'елку')).toBe(true);
     expect(matchesQuery(other, 'зубы')).toBe(false);
     expect(matchesQuery(other, '  ')).toBe(true);
+  });
+});
+
+describe('taskCopyText', () => {
+  it('копирует только заполненные поля', () => {
+    expect(
+      taskCopyText({
+        title: 'Полечить зубы',
+        dueDate: '2026-11-03',
+        estimatedCostMinor: 1_500_000,
+        tags: ['Медицина', 'Деньги'],
+        description: 'Клиника на Тверской',
+        isCompleted: false,
+      }),
+    ).toBe(
+      'Полечить зубы\nСрок: 3 ноября 2026\nСтоимость: 15\u00a0000\u00a0₽\nРазделы: Медицина, Деньги\nЗаметка: Клиника на Тверской',
+    );
+  });
+
+  it('без даты, стоимости, разделов и заметки — только название', () => {
+    expect(
+      taskCopyText({
+        title: ' Забрать посылку ',
+        dueDate: null,
+        estimatedCostMinor: null,
+        tags: [],
+        description: null,
+        isCompleted: false,
+      }),
+    ).toBe('Забрать посылку');
+    expect(
+      taskCopyText({
+        title: 'Оплатить',
+        dueDate: null,
+        estimatedCostMinor: 0,
+        tags: [],
+        description: null,
+        isCompleted: true,
+      }),
+    ).toBe('Оплатить\nСтатус: выполнено');
   });
 });

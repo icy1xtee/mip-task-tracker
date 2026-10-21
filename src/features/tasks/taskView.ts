@@ -1,4 +1,6 @@
-import { diffDays, formatDayMonthShort, type IsoDate } from '@/lib/format/dates';
+import { joinLines } from '@/lib/clipboard';
+import { diffDays, formatDayMonthShort, formatFullDate, type IsoDate } from '@/lib/format/dates';
+import { formatMoney } from '@/lib/format/money';
 import { pl } from '@/lib/format/plural';
 import type { Task } from '@/types/models';
 
@@ -82,4 +84,21 @@ export function matchesQuery(task: Task, query: string): boolean {
   const q = fold(query.trim());
   if (!q) return true;
   return fold([task.title, task.description ?? '', ...task.tags].join(' ')).includes(q);
+}
+
+/** Текст дела для буфера обмена: только заполненные поля. */
+export function taskCopyText(
+  t: Pick<
+    Task,
+    'title' | 'dueDate' | 'estimatedCostMinor' | 'tags' | 'description' | 'isCompleted'
+  >,
+): string {
+  return joinLines([
+    t.title.trim(),
+    t.isCompleted && 'Статус: выполнено',
+    t.dueDate && `Срок: ${formatFullDate(t.dueDate)}`,
+    t.estimatedCostMinor ? `Стоимость: ${formatMoney(t.estimatedCostMinor)}` : null,
+    t.tags.length > 0 && `Разделы: ${t.tags.join(', ')}`,
+    t.description && `Заметка: ${t.description.trim()}`,
+  ]);
 }

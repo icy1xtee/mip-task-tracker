@@ -8,12 +8,13 @@ import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/useToast';
 import { useConfirmDelete } from '@/components/ui/useConfirmDelete';
 import { getErrorMessage } from '@/lib/firebase/errors';
-import { minorToRublesInput } from '@/lib/format/money';
+import { isIsoDate } from '@/lib/format/dates';
+import { minorToRublesInput, parseRublesToMinor } from '@/lib/format/money';
 import { optionalDate, optionalMoney, optionalText, titleField } from '@/lib/forms';
 import type { Task } from '@/types/models';
 import { createTask, deleteTask, updateTask } from './api';
 import { TagPicker } from './TagPicker';
-import { taskDeleteCopy } from './taskView';
+import { taskCopyText, taskDeleteCopy } from './taskView';
 
 const schema = z.object({
   title: titleField(),
@@ -42,6 +43,7 @@ export function TaskForm({ task, knownTags, defaultDueDate = '', onClose }: Task
   const {
     register,
     control,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
@@ -92,6 +94,22 @@ export function TaskForm({ task, knownTags, defaultDueDate = '', onClose }: Task
         saving={isSubmitting}
         error={error}
         onDelete={task ? () => del.ask(task) : undefined}
+        copyText={
+          task
+            ? () => {
+                // Копируем то, что сейчас в форме (в том числе несохранённые правки), без пустых полей.
+                const v = getValues();
+                return taskCopyText({
+                  title: v.title || task.title,
+                  dueDate: isIsoDate(v.dueDate) ? v.dueDate : null,
+                  estimatedCostMinor: parseRublesToMinor(v.cost),
+                  tags: v.tags,
+                  description: v.description.trim() || null,
+                  isCompleted: task.isCompleted,
+                });
+              }
+            : undefined
+        }
       >
         <Field label="Название" error={errors.title?.message}>
           {(p) => (

@@ -1,4 +1,5 @@
 import type { IconName } from '@/components/ui/Icon';
+import { joinLines } from '@/lib/clipboard';
 import type { LinkItem, LinkType } from '@/types/models';
 
 /** Типы ссылок: значения ТЗ (workspace/document/spreadsheet/other) + «Папка» из макета. */
@@ -18,3 +19,13 @@ export const linkDeleteCopy = {
   title: (l: LinkItem) => `Удалить ссылку «${l.title}»?`,
   text: () => 'Ссылка пропадёт из каталога. Сам документ останется на месте.',
 };
+
+/** Текст ссылки для буфера обмена: название, адрес, тип и описание (если есть). */
+export function linkCopyText(l: Pick<LinkItem, 'title' | 'url' | 'type' | 'description'>): string {
+  return joinLines([
+    l.title.trim(),
+    l.url,
+    `Тип: ${linkTypeMeta(l.type).label}`,
+    l.description && l.description.trim(),
+  ]);
+}

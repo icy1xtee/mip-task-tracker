@@ -1,7 +1,8 @@
 import type { TagTone } from '@/components/ui/Tag';
 import type { IconName } from '@/components/ui/Icon';
 import type { MenuItem } from '@/components/ui/Menu';
-import { formatDayMonthShort, type IsoDate } from '@/lib/format/dates';
+import { joinLines } from '@/lib/clipboard';
+import { formatDayMonthShort, formatFullDate, type IsoDate } from '@/lib/format/dates';
 import { formatMoney } from '@/lib/format/money';
 import type { Activity, ActivityStatus } from '@/types/models';
 
@@ -89,4 +90,44 @@ export function ideaMenuItems(idea: Activity, h: IdeaHandlers): MenuItem[] {
   }
   items.push({ label: 'Удалить', icon: 'trash', danger: true, onSelect: () => h.onDelete(idea) });
   return items;
+}
+
+const STATUS_COPY: Record<Activity['status'], string> = {
+  wishlist: '',
+  booked: 'Бронирование: забронировано',
+  completed: 'Статус: сходили',
+  archived: 'Статус: в архиве',
+};
+
+/** Текст идеи для буфера обмена: только заполненные поля. Бесплатно (0 ₽) — это данные, не пустота. */
+export function ideaCopyText(
+  a: Pick<
+    Activity,
+    | 'title'
+    | 'description'
+    | 'url'
+    | 'estimatedCostMinor'
+    | 'status'
+    | 'needsBooking'
+    | 'plannedDate'
+  >,
+): string {
+  const booking =
+    a.status === 'wishlist'
+      ? a.needsBooking
+        ? 'Бронирование: нужна бронь'
+        : 'Бронирование: не нужна'
+      : STATUS_COPY[a.status];
+  return joinLines([
+    a.title.trim(),
+    a.estimatedCostMinor === 0
+      ? 'Стоимость: бесплатно'
+      : a.estimatedCostMinor
+        ? `Примерно на двоих: ${formatMoney(a.estimatedCostMinor)}`
+        : null,
+    a.plannedDate && `Дата: ${formatFullDate(a.plannedDate)}`,
+    booking,
+    a.url && `Ссылка: ${a.url}`,
+    a.description && a.description.trim(),
+  ]);
 }

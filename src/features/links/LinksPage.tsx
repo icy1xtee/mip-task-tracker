@@ -5,17 +5,20 @@ import { buttonClass } from '@/components/ui/buttonClass';
 import { Chips, type ChoiceOption } from '@/components/ui/Choice';
 import { SearchInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
+import { CopyButton } from '@/components/ui/CopyButton';
 import { RowMenu } from '@/components/ui/Menu';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataView, EmptyState } from '@/components/ui/States';
 import { Tag } from '@/components/ui/Tag';
 import { useConfirmDelete } from '@/components/ui/useConfirmDelete';
+import { useToast } from '@/components/ui/useToast';
+import { copyText } from '@/lib/clipboard';
 import { pl } from '@/lib/format/plural';
 import { domainOf } from '@/lib/format/url';
 import type { LinkItem, LinkType } from '@/types/models';
 import { deleteLink, useLinks } from './api';
 import { LinkForm } from './LinkForm';
-import { LINK_TYPES, linkDeleteCopy, linkTypeMeta } from './linkTypes';
+import { LINK_TYPES, linkCopyText, linkDeleteCopy, linkTypeMeta } from './linkTypes';
 
 type Filter = 'all' | LinkType;
 
@@ -25,6 +28,15 @@ export function LinksPage() {
   const [type, setType] = useState<Filter>('all');
   const [form, setForm] = useState<{ link: LinkItem | null } | null>(null);
   const openNew = () => setForm({ link: null });
+  const toast = useToast();
+  const copyLink = (l: LinkItem) =>
+    copyText(linkCopyText(l)).then(
+      () => toast('Скопировано в буфер обмена'),
+      () =>
+        toast('Не удалось скопировать. Разрешите доступ к буферу обмена и попробуйте ещё раз.', {
+          error: true,
+        }),
+    );
 
   usePageChrome({ title: 'Ссылки', sub: 'Общие ресурсы', addLabel: 'Добавить ссылку' }, openNew);
 
@@ -127,6 +139,12 @@ export function LinksPage() {
                           <span className="link-open-label">Открыть</span>
                           <Icon name="ext" />
                         </ExternalLink>
+                        <CopyButton
+                          size="sm"
+                          className="link-copy"
+                          label={`Скопировать «${l.title}»`}
+                          getText={() => linkCopyText(l)}
+                        />
                         <RowMenu
                           label={`Действия: ${l.title}`}
                           items={[
@@ -135,6 +153,7 @@ export function LinksPage() {
                               icon: 'pencil',
                               onSelect: () => setForm({ link: l }),
                             },
+                            { label: 'Скопировать', icon: 'copy', onSelect: () => copyLink(l) },
                             {
                               label: 'Удалить',
                               icon: 'trash',

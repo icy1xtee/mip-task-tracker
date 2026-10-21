@@ -1,6 +1,7 @@
 import { Dialog } from 'radix-ui';
 import type { FormEvent, ReactNode } from 'react';
 import { Button, IconButton } from './Button';
+import { CopyButton } from './CopyButton';
 import { FieldError } from './Field';
 import { usePortalContainer } from './portal';
 import { useSheetDrag } from './useSheetDrag';
@@ -16,6 +17,8 @@ type PanelProps = {
   error?: string | null;
   /** «Удалить» слева в подвале — только при редактировании. */
   onDelete?: () => void;
+  /** Квадратная кнопка «Копировать» рядом с «Сохранить»: текст собирается в момент нажатия. */
+  copyText?: () => string;
   children: ReactNode;
 };
 
@@ -32,6 +35,7 @@ export function Panel({
   saving,
   error,
   onDelete,
+  copyText,
   children,
 }: PanelProps) {
   const container = usePortalContainer();
@@ -67,6 +71,7 @@ export function Panel({
                   Отмена
                 </Button>
               </Dialog.Close>
+              {copyText && <CopyButton getText={copyText} label="Скопировать всё в буфер обмена" />}
               <Button type="submit" pending={saving}>
                 {submitLabel}
               </Button>

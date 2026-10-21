@@ -2646,3 +2646,30 @@ button.acc:focus-visible,
     background-clip: padding-box;
   }
 }
+/* Квадратная кнопка с иконкой (копировать) — высота как у соседних кнопок. */
+.btn-square {
+  width: 40px;
+  padding: 0;
+  flex: none;
+}
+.btn-square.btn-sm {
+  width: 32px;
+}
+@container app (max-width:699px) {
+  .btn-square {
+    width: 44px;
+  }
+  .btn-square.btn-sm {
+    width: 36px;
+  }
+  .panel-foot .btn-square {
+    width: 48px;
+    height: 48px;
+  }
+}
+/* Ссылки: на узком экране копирование — в меню «…», чтобы не сжимать название. */
+@container main (max-width:640px) {
+  .link-row .link-copy {
+    display: none;
+  }
+}

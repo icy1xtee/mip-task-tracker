@@ -204,3 +204,9 @@ export function formatMonthColumn(month: IsoMonth): string {
 export function dayOfMonth(value: IsoDate): number {
   return parts(value).d;
 }
+
+/** «25 октября 2026» — всегда с годом (для текста, который уходит за пределы приложения). */
+export function formatFullDate(value: IsoDate): string {
+  const { y, m, d } = parts(value);
+  return `${d} ${MONTHS_GENITIVE[m - 1]} ${y}`;
+}
