@@ -2512,3 +2512,48 @@ button.acc:focus-visible,
     width: 100%;
   }
 }
+.tag-add {
+  display: flex;
+  gap: 8px;
+}
+.tag-add .input {
+  flex: 1;
+  min-width: 0;
+}
+.row-tags {
+  display: inline-flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+.row-tags .tag {
+  height: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.row-meta .row-tags {
+  flex: none;
+  max-width: 60%;
+}
+.row-tags .tag {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  flex: none;
+}
+.row-tags .tag-more {
+  display: none;
+}
+@container main (max-width:640px) {
+  .row-tags .tag:not(:first-child) {
+    display: none;
+  }
+  .row-tags .tag.tag-more {
+    display: inline-block;
+  }
+  .row-tags .tag {
+    max-width: 96px;
+  }
+}

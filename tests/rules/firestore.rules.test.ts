@@ -5,7 +5,15 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 const rules = readFileSync('firestore.rules', 'utf8');
@@ -74,14 +82,37 @@ describe('tasks', () => {
     await assertFails(setDoc(ref, { ...missing, ...now() }));
     await assertFails(setDoc(ref, { ...task, estimatedCostMinor: 10.5, ...now() }));
     await assertFails(setDoc(ref, { ...task, dueDate: '25.10.2026', ...now() }));
-    await assertFails(setDoc(ref, { ...task, createdAt: Timestamp.now(), updatedAt: Timestamp.now() }));
+    await assertFails(
+      setDoc(ref, { ...task, createdAt: Timestamp.now(), updatedAt: Timestamp.now() }),
+    );
     await assertFails(setDoc(ref, { ...task, title: '', ...now() }));
+  });
+
+  it('разделы: список до 10 штук; старые дела без поля tags по-прежнему обновляются', async () => {
+    const db = member();
+    await assertSucceeds(
+      setDoc(doc(db, 'tasks/t1'), { ...task, tags: ['Медицина', 'Деньги'], ...now() }),
+    );
+    await assertFails(setDoc(doc(db, 'tasks/t2'), { ...task, tags: 'Медицина', ...now() }));
+    await assertFails(
+      setDoc(doc(db, 'tasks/t3'), {
+        ...task,
+        tags: Array.from({ length: 11 }, (_, i) => `t${i}`),
+        ...now(),
+      }),
+    );
+    const legacy = doc(db, 'tasks/legacy');
+    await assertSucceeds(setDoc(legacy, { ...task, ...now() }));
+    await assertSucceeds(updateDoc(legacy, { isCompleted: true, updatedAt: serverTimestamp() }));
+    await assertSucceeds(updateDoc(legacy, { tags: ['Дом'], updatedAt: serverTimestamp() }));
   });
 
   it('createdAt нельзя переписать при обновлении', async () => {
     const ref = doc(member(), 'tasks/t1');
     await assertSucceeds(setDoc(ref, { ...task, ...now() }));
-    await assertFails(updateDoc(ref, { createdAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+    await assertFails(
+      updateDoc(ref, { createdAt: serverTimestamp(), updatedAt: serverTimestamp() }),
+    );
   });
 });
 
@@ -98,46 +129,108 @@ describe('activities и links', () => {
 
   it('принимает идею и отклоняет небезопасный URL и неизвестный статус', async () => {
     await assertSucceeds(setDoc(doc(member(), 'activities/a1'), { ...idea, ...now() }));
-    await assertFails(setDoc(doc(member(), 'activities/a2'), { ...idea, url: 'javascript:alert(1)', ...now() }));
-    await assertFails(setDoc(doc(member(), 'activities/a3'), { ...idea, status: 'maybe', ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'activities/a2'), { ...idea, url: 'javascript:alert(1)', ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'activities/a3'), { ...idea, status: 'maybe', ...now() }),
+    );
   });
 
   it('ссылка обязана быть http(s)', async () => {
-    const link = { title: 'Notion', url: 'https://notion.so', description: null, type: 'workspace', tags: [] };
+    const link = {
+      title: 'Notion',
+      url: 'https://notion.so',
+      description: null,
+      type: 'workspace',
+      tags: [],
+    };
     await assertSucceeds(setDoc(doc(member(), 'links/l1'), { ...link, ...now() }));
-    await assertFails(setDoc(doc(member(), 'links/l2'), { ...link, url: 'data:text/html,x', ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'links/l2'), { ...link, url: 'data:text/html,x', ...now() }),
+    );
     await assertFails(setDoc(doc(member(), 'links/l3'), { ...link, type: 'video', ...now() }));
   });
 });
 
 describe('бюджет', () => {
-  const entry = { title: 'Коммуналка', type: 'expense', amountMinor: 700000, accountId: 'acc', category: 'housing', note: null };
+  const entry = {
+    title: 'Коммуналка',
+    type: 'expense',
+    amountMinor: 700000,
+    accountId: 'acc',
+    category: 'housing',
+    note: null,
+  };
 
   it('счёт: знаковый целый баланс и дата фиксации', async () => {
-    const account = { name: 'Кредитка', type: 'credit', openingBalanceMinor: -1845000, balanceAsOfDate: '2026-10-20' };
+    const account = {
+      name: 'Кредитка',
+      type: 'credit',
+      openingBalanceMinor: -1845000,
+      balanceAsOfDate: '2026-10-20',
+    };
     await assertSucceeds(setDoc(doc(member(), 'accounts/a1'), { ...account, ...now() }));
-    await assertFails(setDoc(doc(member(), 'accounts/a2'), { ...account, openingBalanceMinor: -18450.5, ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'accounts/a2'), { ...account, openingBalanceMinor: -18450.5, ...now() }),
+    );
   });
 
   it('суммы операций — только положительные целые', async () => {
-    await assertSucceeds(setDoc(doc(member(), 'plannedEntries/p1'), { ...entry, date: '2026-10-25', status: 'planned', ...now() }));
-    await assertFails(setDoc(doc(member(), 'plannedEntries/p2'), { ...entry, amountMinor: -700000, date: '2026-10-25', status: 'planned', ...now() }));
+    await assertSucceeds(
+      setDoc(doc(member(), 'plannedEntries/p1'), {
+        ...entry,
+        date: '2026-10-25',
+        status: 'planned',
+        ...now(),
+      }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'plannedEntries/p2'), {
+        ...entry,
+        amountMinor: -700000,
+        date: '2026-10-25',
+        status: 'planned',
+        ...now(),
+      }),
+    );
     const tx = { ...entry, date: '2026-10-25', plannedEntryId: 'p1', recurringOccurrenceId: null };
     delete (tx as Partial<typeof tx>).title;
     await assertSucceeds(setDoc(doc(member(), 'transactions/t1'), { ...tx, ...now() }));
-    await assertFails(setDoc(doc(member(), 'transactions/t2'), { ...tx, amountMinor: 0, ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'transactions/t2'), { ...tx, amountMinor: 0, ...now() }),
+    );
   });
 
   it('регулярное правило: окончание не раньше начала', async () => {
-    const rule = { ...entry, frequency: 'monthly', startDate: '2026-01-31', endDate: null, dayOfMonth: 31 };
+    const rule = {
+      ...entry,
+      frequency: 'monthly',
+      startDate: '2026-01-31',
+      endDate: null,
+      dayOfMonth: 31,
+    };
     await assertSucceeds(setDoc(doc(member(), 'recurringRules/r1'), { ...rule, ...now() }));
-    await assertFails(setDoc(doc(member(), 'recurringRules/r2'), { ...rule, endDate: '2025-12-31', ...now() }));
-    await assertFails(setDoc(doc(member(), 'recurringRules/r3'), { ...rule, dayOfMonth: 32, ...now() }));
+    await assertFails(
+      setDoc(doc(member(), 'recurringRules/r2'), { ...rule, endDate: '2025-12-31', ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'recurringRules/r3'), { ...rule, dayOfMonth: 32, ...now() }),
+    );
   });
 
   it('экземпляр повтора: id строго «ruleId_дата», чтобы не было дублей', async () => {
-    const occ = { ruleId: 'r1', date: '2026-10-31', status: 'completed', actualTransactionId: 't1' };
-    await assertSucceeds(setDoc(doc(member(), 'recurringOccurrences/r1_2026-10-31'), { ...occ, ...now() }));
-    await assertFails(setDoc(doc(member(), 'recurringOccurrences/random-id'), { ...occ, ...now() }));
+    const occ = {
+      ruleId: 'r1',
+      date: '2026-10-31',
+      status: 'completed',
+      actualTransactionId: 't1',
+    };
+    await assertSucceeds(
+      setDoc(doc(member(), 'recurringOccurrences/r1_2026-10-31'), { ...occ, ...now() }),
+    );
+    await assertFails(
+      setDoc(doc(member(), 'recurringOccurrences/random-id'), { ...occ, ...now() }),
+    );
   });
 });

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Field, MoneyInput, TextArea, TextInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
@@ -12,6 +12,7 @@ import { minorToRublesInput } from '@/lib/format/money';
 import { optionalDate, optionalMoney, optionalText, titleField } from '@/lib/forms';
 import type { Task } from '@/types/models';
 import { createTask, deleteTask, updateTask } from './api';
+import { TagPicker } from './TagPicker';
 import { taskDeleteCopy } from './taskView';
 
 const schema = z.object({
@@ -19,20 +20,28 @@ const schema = z.object({
   dueDate: optionalDate,
   cost: optionalMoney,
   description: optionalText(),
+  tags: z.array(z.string()).max(10),
 });
 
 type FormInput = z.input<typeof schema>;
 type FormOutput = z.output<typeof schema>;
 
-type TaskFormProps = { task: Task | null; defaultDueDate?: string; onClose: () => void };
+type TaskFormProps = {
+  task: Task | null;
+  /** Разделы других дел — для выбора чипами. */
+  knownTags: string[];
+  defaultDueDate?: string;
+  onClose: () => void;
+};
 
 /** Новое дело / изменить дело — боковая панель или bottom sheet. */
-export function TaskForm({ task, defaultDueDate = '', onClose }: TaskFormProps) {
+export function TaskForm({ task, knownTags, defaultDueDate = '', onClose }: TaskFormProps) {
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const [showNote, setShowNote] = useState(Boolean(task?.description));
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
@@ -42,6 +51,7 @@ export function TaskForm({ task, defaultDueDate = '', onClose }: TaskFormProps) 
       dueDate: task?.dueDate ?? defaultDueDate,
       cost: task?.estimatedCostMinor ? minorToRublesInput(task.estimatedCostMinor) : '',
       description: task?.description ?? '',
+      tags: task?.tags ?? [],
     },
   });
 
@@ -59,6 +69,7 @@ export function TaskForm({ task, defaultDueDate = '', onClose }: TaskFormProps) 
       dueDate: v.dueDate,
       estimatedCostMinor: v.cost,
       description: v.description,
+      tags: v.tags,
     };
     try {
       if (task) await updateTask(task.id, input);
@@ -100,6 +111,13 @@ export function TaskForm({ task, defaultDueDate = '', onClose }: TaskFormProps) 
             {(p) => <MoneyInput {...p} {...register('cost')} />}
           </Field>
         </div>
+        <Controller
+          control={control}
+          name="tags"
+          render={({ field }) => (
+            <TagPicker value={field.value} onChange={field.onChange} known={knownTags} />
+          )}
+        />
         {showNote ? (
           <Field label="Заметка" error={errors.description?.message}>
             {(p) => (

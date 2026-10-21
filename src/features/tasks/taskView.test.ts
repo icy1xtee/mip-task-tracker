@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Task } from '@/types/models';
-import { describeDue, sortByDue } from './taskView';
+import {
+  collectTags,
+  describeDue,
+  hasTag,
+  matchesQuery,
+  normalizeTag,
+  sortByDue,
+} from './taskView';
 
 const TODAY = '2026-10-20';
 const task = (id: string, dueDate: string | null, isCompleted = false): Task => ({
@@ -11,6 +18,7 @@ const task = (id: string, dueDate: string | null, isCompleted = false): Task => 
   description: null,
   estimatedCostMinor: null,
   assignee: null,
+  tags: [],
   createdAt: null,
   updatedAt: null,
 });
@@ -39,5 +47,38 @@ describe('sortByDue', () => {
   it('сортирует по сроку, без срока — в конце', () => {
     const sorted = sortByDue([task('c', null), task('b', '2026-10-25'), task('a', '2026-10-18')]);
     expect(sorted.map((t) => t.id)).toEqual(['a', 'b', 'c']);
+  });
+});
+
+describe('разделы и поиск', () => {
+  const eyes = { ...task('Сходить к врачу по поводу зрения', null), tags: ['Медицина'] };
+  const teeth = {
+    ...task('Полечить зубы', null),
+    tags: ['медицина', 'Деньги'],
+    description: 'Клиника на Тверской',
+  };
+  const other = task('Купить ёлку', null);
+
+  it('нормализует название раздела', () => {
+    expect(normalizeTag('  Медицина   и   здоровье ')).toBe('Медицина и здоровье');
+    expect(normalizeTag('   ')).toBeNull();
+    expect(normalizeTag('x'.repeat(50))).toHaveLength(30);
+  });
+
+  it('собирает разделы без учёта регистра и считает дела', () => {
+    expect(collectTags([eyes, teeth, other])).toEqual([
+      { tag: 'Деньги', count: 1 },
+      { tag: 'Медицина', count: 2 },
+    ]);
+    expect(hasTag(teeth, 'МЕДИЦИНА')).toBe(true);
+  });
+
+  it('ищет по названию, заметке и разделам; ё = е', () => {
+    expect(matchesQuery(eyes, 'зрени')).toBe(true);
+    expect(matchesQuery(teeth, 'тверск')).toBe(true);
+    expect(matchesQuery(teeth, 'деньги')).toBe(true);
+    expect(matchesQuery(other, 'елку')).toBe(true);
+    expect(matchesQuery(other, 'зубы')).toBe(false);
+    expect(matchesQuery(other, '  ')).toBe(true);
   });
 });

@@ -29,7 +29,7 @@ import { costLabel, randomPool, statusTag } from '@/features/ideas/ideaView';
 import { useTasks } from '@/features/tasks/api';
 import { TaskForm } from '@/features/tasks/TaskForm';
 import { TaskRow } from '@/features/tasks/TaskRow';
-import { isOverdue, sortByDue } from '@/features/tasks/taskView';
+import { collectTags, isOverdue, sortByDue } from '@/features/tasks/taskView';
 import { useTaskToggle } from '@/features/tasks/useTaskToggle';
 import { overviewForecast, upcomingPayments } from './overviewView';
 
@@ -202,7 +202,13 @@ export function OverviewPage() {
           </div>
         )}
       </DataView>
-      {taskForm && <TaskForm task={taskForm.task} onClose={() => setTaskForm(null)} />}
+      {taskForm && (
+        <TaskForm
+          task={taskForm.task}
+          knownTags={collectTags(tasks.data).map((t) => t.tag)}
+          onClose={() => setTaskForm(null)}
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { RowMenu } from '@/components/ui/Menu';
 import { TaskCheck } from '@/components/ui/TaskCheck';
 import { cx } from '@/components/ui/cx';
 import { Icon } from '@/components/ui/Icon';
+import { Tag } from '@/components/ui/Tag';
 import { formatMoney } from '@/lib/format/money';
 import type { IsoDate } from '@/lib/format/dates';
 import type { Task } from '@/types/models';
@@ -37,6 +38,18 @@ export function TaskRow({ task, today, onToggle, onEdit, onDelete }: TaskRowProp
         >
           {due.tone === 'overdue' && <Icon name="clock" />}
           <span>{due.text}</span>
+          {task.tags.length > 0 && (
+            <span className="row-tags" aria-label={`Разделы: ${task.tags.join(', ')}`}>
+              {task.tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+              {task.tags.length > 1 && (
+                <span className="tag tag-more" aria-hidden="true">
+                  +{task.tags.length - 1}
+                </span>
+              )}
+            </span>
+          )}
         </div>
       </div>
       <div className="row-cost" style={onDelete ? undefined : { paddingRight: 8 }}>

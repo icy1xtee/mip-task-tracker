@@ -9,6 +9,7 @@ import {
   safeParser,
   str,
   strOrNull,
+  strings,
 } from '@/lib/firebase/parse';
 import type { IsoDate } from '@/lib/format/dates';
 import type { Task } from '@/types/models';
@@ -21,6 +22,8 @@ const parseTask = safeParser('tasks', (id, d): Task => ({
   estimatedCostMinor: intOrNull(d, 'estimatedCostMinor'),
   assignee: oneOfOrNull(d, 'assignee', ['me', 'partner', 'both'] as const),
   isCompleted: bool(d, 'isCompleted'),
+  // У дел, созданных до появления разделов, поля нет — считаем, что разделов нет.
+  tags: strings(d, 'tags'),
 }));
 
 export function useTasks() {
@@ -32,6 +35,7 @@ export type TaskInput = {
   description: string | null;
   dueDate: IsoDate | null;
   estimatedCostMinor: number | null;
+  tags: string[];
 };
 
 export function createTask(input: TaskInput) {

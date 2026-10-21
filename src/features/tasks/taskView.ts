@@ -41,3 +41,45 @@ export const taskDeleteCopy = {
   title: (t: Task) => `Удалить дело «${t.title}»?`,
   text: () => 'Дело исчезнет из списка у вас обоих.',
 };
+
+export const MAX_TAGS_PER_TASK = 10;
+export const MAX_TAG_LENGTH = 30;
+
+/** «  медицина  » → «медицина»; пустое — null. Регистр сохраняется, сравнение — без регистра. */
+export function normalizeTag(input: string): string | null {
+  const tag = input.trim().replace(/\s+/g, ' ').slice(0, MAX_TAG_LENGTH).trim();
+  return tag || null;
+}
+
+export function sameTag(a: string, b: string): boolean {
+  return a.toLocaleLowerCase('ru') === b.toLocaleLowerCase('ru');
+}
+
+/** Все разделы из дел с количеством дел, по алфавиту. Разные регистры — один раздел. */
+export function collectTags(tasks: Task[]): { tag: string; count: number }[] {
+  const map = new Map<string, { tag: string; count: number }>();
+  for (const t of tasks) {
+    for (const tag of t.tags) {
+      const key = tag.toLocaleLowerCase('ru');
+      const entry = map.get(key) ?? { tag, count: 0 };
+      entry.count += 1;
+      map.set(key, entry);
+    }
+  }
+  return [...map.values()].sort((a, b) => a.tag.localeCompare(b.tag, 'ru'));
+}
+
+export function hasTag(task: Task, tag: string): boolean {
+  return task.tags.some((t) => sameTag(t, tag));
+}
+
+function fold(text: string): string {
+  return text.toLocaleLowerCase('ru').replace(/ё/g, 'е');
+}
+
+/** Поиск по названию, заметке и разделам; «ё» = «е», без учёта регистра. */
+export function matchesQuery(task: Task, query: string): boolean {
+  const q = fold(query.trim());
+  if (!q) return true;
+  return fold([task.title, task.description ?? '', ...task.tags].join(' ')).includes(q);
+}

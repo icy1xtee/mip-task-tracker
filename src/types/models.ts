@@ -17,6 +17,8 @@ export type Task = Audit & {
   estimatedCostMinor: number | null;
   assignee: Assignee | null;
   isCompleted: boolean;
+  /** Пользовательские разделы («Медицина», «Дом»); одно дело может быть в нескольких. */
+  tags: string[];
 };
 
 export type ActivityStatus = 'wishlist' | 'booked' | 'completed' | 'archived';

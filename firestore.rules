@@ -77,9 +77,12 @@ service cloud.firestore {
 
     // ---- коллекции ----
 
+    // tags (разделы) необязательны: у дел, созданных раньше, этого поля нет.
     function validTask() {
       let d = data();
-      return exactKeys(['title', 'description', 'dueDate', 'estimatedCostMinor', 'assignee', 'isCompleted', 'createdAt', 'updatedAt'])
+      return d.keys().hasOnly(['title', 'description', 'dueDate', 'estimatedCostMinor', 'assignee', 'isCompleted', 'tags', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['title', 'description', 'dueDate', 'estimatedCostMinor', 'assignee', 'isCompleted', 'createdAt', 'updatedAt'])
+        && (!('tags' in d) || (d.tags is list && d.tags.size() <= 10))
         && text(d.title, 200)
         && optText(d.description, 2000)
         && optDate(d.dueDate)
