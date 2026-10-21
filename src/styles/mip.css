@@ -37,6 +37,21 @@ html,
 body {
   background: var(--bg);
 }
+html {
+  /* Safari не раздувает текст при повороте телефона. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+/*
+ * iOS Safari зумит страницу при фокусе на поле со шрифтом < 16px — появляется горизонтальный скролл.
+ * На сенсорных устройствах поля получают 16px; на desktop остаётся 15px дизайн-системы.
+ * maximum-scale в viewport не используем: он отключает ручное увеличение (доступность).
+ */
+@media (pointer: coarse) {
+  .mip .input:not(.input-lg) {
+    font-size: 16px;
+  }
+}
 .mip {
   container: app/inline-size;
   width: 100%;
