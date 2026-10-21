@@ -74,6 +74,23 @@ export function Select({ className, children, ...props }: ComponentProps<'select
   );
 }
 
+/**
+ * Календарная дата. Нативный пикер браузера, но размеры и иконка — дизайн-системы:
+ * iOS Safari иначе растягивает поле по тексту даты и не показывает иконку.
+ */
+export function DateInput({ className, ...props }: Omit<InputProps, 'type'>) {
+  return (
+    <div className="date-wrap">
+      <input
+        type="date"
+        className={cx('input input-date', props['aria-invalid'] && 'is-error', className)}
+        {...props}
+      />
+      <Icon name="calendar" />
+    </div>
+  );
+}
+
 /** Сумма в рублях: текстовое поле с суффиксом ₽ (крупное — для форм операций). */
 export function MoneyInput({ large, className, ...props }: InputProps & { large?: boolean }) {
   return (

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Segmented } from '@/components/ui/Choice';
-import { Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
+import { DateInput, Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/useToast';
 import { useConfirmDelete } from '@/components/ui/useConfirmDelete';
@@ -155,7 +155,7 @@ export function AccountForm({ account, usage, onClose }: AccountFormProps) {
             {(p) => <MoneyInput {...p} {...register('amount')} />}
           </Field>
           <Field label="На дату" error={errors.balanceAsOfDate?.message}>
-            {(p) => <TextInput {...p} type="date" {...register('balanceAsOfDate')} />}
+            {(p) => <DateInput {...p} {...register('balanceAsOfDate')} />}
           </Field>
         </div>
         <p className="hint">

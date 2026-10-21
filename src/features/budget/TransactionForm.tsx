@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Chips, Segmented } from '@/components/ui/Choice';
-import { Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
+import { DateInput, Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/useToast';
 import { useConfirmDelete } from '@/components/ui/useConfirmDelete';
@@ -151,7 +151,7 @@ export function TransactionForm({ transaction, accounts, onClose }: TransactionF
         )}
         <div className="row2">
           <Field label="Дата" error={errors.date?.message}>
-            {(p) => <TextInput {...p} type="date" {...register('date')} />}
+            {(p) => <DateInput {...p} {...register('date')} />}
           </Field>
           <Field label="Счёт" error={errors.accountId?.message}>
             {(p) => (

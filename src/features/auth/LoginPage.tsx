@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation } from 'react-router';
 import { z } from 'zod';
+import { Brand } from '@/components/layout/Brand';
 import { Button } from '@/components/ui/Button';
 import { Field, TextInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
@@ -70,15 +71,7 @@ export function LoginPage() {
     <div className="mip">
       <main className="auth">
         <div className="auth-card">
-          <div className="auth-brand">
-            <span className="brand-mark" aria-hidden="true">
-              m
-            </span>
-            <div>
-              <div className="brand-name">mip</div>
-              <div className="brand-sub">наше общее</div>
-            </div>
-          </div>
+          <Brand variant="standalone" />
           <div>
             <h1 className="h1">Вход</h1>
             <p className="lead">Войдите в общий аккаунт, чтобы продолжить.</p>

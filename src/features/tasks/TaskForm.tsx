@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Field, MoneyInput, TextArea, TextInput } from '@/components/ui/Field';
+import { DateInput, Field, MoneyInput, TextArea, TextInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/useToast';
@@ -105,7 +105,7 @@ export function TaskForm({ task, knownTags, defaultDueDate = '', onClose }: Task
         </Field>
         <div className="row2">
           <Field label="Срок" optional="если есть" error={errors.dueDate?.message}>
-            {(p) => <TextInput {...p} type="date" {...register('dueDate')} />}
+            {(p) => <DateInput {...p} {...register('dueDate')} />}
           </Field>
           <Field label="Стоимость" optional="если есть" error={errors.cost?.message}>
             {(p) => <MoneyInput {...p} {...register('cost')} />}

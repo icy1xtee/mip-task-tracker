@@ -8,23 +8,9 @@ import { PortalContainerContext } from '@/components/ui/portal';
 import { ToastProvider } from '@/components/ui/toast';
 import { signOutCurrentUser } from '@/features/auth/api';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
+import { Brand } from './Brand';
 import { ChromeContext, type PageChrome } from './chrome';
 import { NAV_ITEMS } from './navigation';
-
-export function Brand() {
-  return (
-    <div className="brand">
-      <span className="brand-mark" aria-hidden="true">
-        ⊹ ࣪
-      </span>
-      <span className="brand-text">
-        <span className="brand-name">mip</span>
-        <br />
-        <span className="brand-sub">task tracker</span>
-      </span>
-    </div>
-  );
-}
 
 export function AppShell() {
   const online = useOnlineStatus();

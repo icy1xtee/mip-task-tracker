@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Segmented } from '@/components/ui/Choice';
-import { Field, MoneyInput, TextArea, TextInput } from '@/components/ui/Field';
+import { DateInput, Field, MoneyInput, TextArea, TextInput } from '@/components/ui/Field';
 import { Panel } from '@/components/ui/Panel';
 import { Tag } from '@/components/ui/Tag';
 import { useToast } from '@/components/ui/useToast';
@@ -179,7 +179,7 @@ export function IdeaForm({ idea, onClose }: { idea: Activity | null; onClose: ()
           )
         )}
         <Field label="Дата" optional="если запланировали" error={errors.plannedDate?.message}>
-          {(p) => <TextInput {...p} type="date" {...register('plannedDate')} />}
+          {(p) => <DateInput {...p} {...register('plannedDate')} />}
         </Field>
       </Panel>
       {del.dialog}

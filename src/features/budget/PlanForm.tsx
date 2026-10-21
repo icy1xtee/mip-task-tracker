@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Segmented } from '@/components/ui/Choice';
-import { Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
+import { DateInput, Field, MoneyInput, Select, TextInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/useToast';
@@ -164,7 +164,7 @@ export function PlanForm({ target, accounts, onClose }: PlanFormProps) {
       </Field>
       <div className="row2">
         <Field label={repeat ? 'Начиная с' : 'Дата'} error={errors.date?.message}>
-          {(p) => <TextInput {...p} type="date" {...register('date')} />}
+          {(p) => <DateInput {...p} {...register('date')} />}
         </Field>
         <Field label="Счёт" error={errors.accountId?.message}>
           {(p) => (
@@ -222,7 +222,7 @@ export function PlanForm({ target, accounts, onClose }: PlanFormProps) {
             />
           </div>
           <Field label="До" optional="если нужно" error={errors.endDate?.message}>
-            {(p) => <TextInput {...p} type="date" {...register('endDate')} />}
+            {(p) => <DateInput {...p} {...register('endDate')} />}
           </Field>
         </>
       )}
