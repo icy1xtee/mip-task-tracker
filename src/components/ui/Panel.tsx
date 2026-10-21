@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { Button, IconButton } from './Button';
 import { FieldError } from './Field';
 import { usePortalContainer } from './portal';
+import { useSheetDrag } from './useSheetDrag';
 
 type PanelProps = {
   open: boolean;
@@ -20,7 +21,7 @@ type PanelProps = {
 
 /**
  * Форма в боковой панели 448px (desktop/планшет) или bottom sheet (телефон).
- * Пока идёт сохранение, панель не закрывается.
+ * Пока идёт сохранение, панель не закрывается. На телефоне закрывается и свайпом вниз.
  */
 export function Panel({
   open,
@@ -34,17 +35,20 @@ export function Panel({
   children,
 }: PanelProps) {
   const container = usePortalContainer();
+  const { contentRef, overlayRef, dragHandlers } = useSheetDrag({ enabled: !saving, onClose });
   return (
     <Dialog.Root open={open} onOpenChange={(next) => !next && !saving && onClose()}>
       <Dialog.Portal container={container}>
-        <Dialog.Overlay className="scrim" />
-        <Dialog.Content className="panel" aria-describedby={undefined}>
-          <div className="grabber" />
-          <div className="panel-head">
-            <Dialog.Title className="h2">{title}</Dialog.Title>
-            <Dialog.Close asChild>
-              <IconButton icon="x" label="Закрыть" disabled={saving} />
-            </Dialog.Close>
+        <Dialog.Overlay className="scrim" ref={overlayRef} />
+        <Dialog.Content className="panel" aria-describedby={undefined} ref={contentRef}>
+          <div className="panel-drag" {...dragHandlers}>
+            <div className="grabber" />
+            <div className="panel-head">
+              <Dialog.Title className="h2">{title}</Dialog.Title>
+              <Dialog.Close asChild>
+                <IconButton icon="x" label="Закрыть" disabled={saving} />
+              </Dialog.Close>
+            </div>
           </div>
           <form className="panel-form" onSubmit={onSubmit} noValidate>
             <div className="panel-body">

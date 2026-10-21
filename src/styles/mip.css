@@ -2628,3 +2628,21 @@ button.acc:focus-visible,
     padding-right: 12px;
   }
 }
+/* Bottom sheet: ручка и заголовок — зона свайпа вниз для закрытия (useSheetDrag). */
+.panel-drag {
+  flex: none;
+}
+@container app (max-width:699px) {
+  .panel-drag {
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .panel-drag .grabber {
+    margin-top: 0;
+    border-top: 8px solid transparent;
+    box-sizing: content-box;
+    background-clip: padding-box;
+  }
+}
