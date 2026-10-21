@@ -66,12 +66,12 @@ export function Panel({
                 </Button>
               )}
               <div className="spacer" />
+              {copyText && <CopyButton getText={copyText} label="Скопировать всё в буфер обмена" />}
               <Dialog.Close asChild>
                 <Button variant="secondary" className="hide-m" disabled={saving}>
                   Отмена
                 </Button>
               </Dialog.Close>
-              {copyText && <CopyButton getText={copyText} label="Скопировать всё в буфер обмена" />}
               <Button type="submit" pending={saving}>
                 {submitLabel}
               </Button>
